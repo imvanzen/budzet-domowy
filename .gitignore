@@ -40,3 +40,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# drizzle
+drizzle
+
+# libsql
+.libsql
+
+# sqlite
+*.sqlite

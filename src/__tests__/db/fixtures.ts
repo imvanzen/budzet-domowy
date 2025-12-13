@@ -58,10 +58,15 @@ export const testSettings: NewSettings = {
   currency: currency.PLN,
 };
 
+import type { LibSQLDatabase } from "drizzle-orm/libsql";
+import type * as schema from "@/db/schema";
+
 /**
  * Helper to seed test database with fixtures
  */
-export async function seedTestDb(db: ReturnType<typeof createTestDb>["db"]) {
+export async function seedTestDb(
+  db: LibSQLDatabase<typeof schema>
+) {
   await db.insert(categories).values(testCategories);
   await db.insert(transactions).values(testTransactions);
   await db.insert(settings).values(testSettings);

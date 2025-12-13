@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
@@ -18,7 +17,6 @@ export function TransactionForm({
   categories,
   onSuccess,
 }: TransactionFormProps) {
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -92,8 +90,6 @@ export function TransactionForm({
           categoryId: "",
           description: "",
         });
-        // Refresh the page to show new transaction
-        router.refresh();
         // Call onSuccess callback if provided
         setTimeout(() => {
           setSuccess(false);

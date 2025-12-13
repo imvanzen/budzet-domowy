@@ -1,4 +1,3 @@
-import { getTransactions } from "@/services/transactions";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { transactionType } from "@/db/schema";
 import type { Transaction } from "@/db/schema";

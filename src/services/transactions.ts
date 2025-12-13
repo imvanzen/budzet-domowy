@@ -1,6 +1,6 @@
 import db from "@/db";
-import { transactions, categories } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { transactions } from "@/db/schema";
+import { desc } from "drizzle-orm";
 import type { NewTransaction, Transaction } from "@/db/schema";
 
 export async function createTransaction(

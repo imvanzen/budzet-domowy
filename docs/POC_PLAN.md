@@ -1,5 +1,7 @@
 # System Zarządzania Budżetem Domowym – PoC Plan
 
+> **📋 Testing Guidelines:** Zobacz [TESTING_GUIDELINES.md](./TESTING_GUIDELINES.md) dla szczegółowych wytycznych dotyczących tworzenia testów zgodnie z Testing Pyramid (70% Unit, 20% Integration, 10% E2E).
+
 ## 1. Business Goals
 
 | ID   | Cel biznesowy                                                                                                |
@@ -28,6 +30,15 @@
 4. ✅ Po zapisie transakcja pojawia się na liście.
 5. ✅ Wyświetla się komunikat sukcesu.
 
+**Testy wymagane:**
+
+- [ ] Unit: `createTransaction()` service
+- [ ] Unit: `addTransaction()` server action validation
+- [ ] Integration: `TransactionForm` rendering
+- [ ] Integration: Form validation (amount, date)
+- [ ] Integration: Form submission success/error
+- [ ] E2E: Complete transaction creation flow
+
 ---
 
 ### US-2: Edycja transakcji
@@ -40,6 +51,14 @@
 2. Walidacja działa tak samo jak przy dodawaniu.
 3. Po zapisie lista odświeża się z nowymi danymi.
 
+**Testy wymagane:**
+
+- [ ] Unit: `updateTransaction()` service
+- [ ] Integration: Edit form pre-fills data
+- [ ] Integration: Edit form validation
+- [ ] Integration: Edit form submission
+- [ ] E2E: Complete edit transaction flow
+
 ---
 
 ### US-3: Usuwanie transakcji
@@ -51,6 +70,14 @@
 1. Przed usunięciem wyświetla się modal potwierdzenia.
 2. Po usunięciu transakcja znika z listy.
 3. Podsumowania i wykresy aktualizują się.
+
+**Testy wymagane:**
+
+- [ ] Unit: `deleteTransaction()` service
+- [ ] Integration: Delete confirmation modal
+- [ ] Integration: Delete action
+- [ ] Integration: List updates after delete
+- [ ] E2E: Complete delete transaction flow
 
 ---
 
@@ -141,6 +168,53 @@
 
 ---
 
+## 2.1. Testing Requirements
+
+**Każda User Story wymaga utworzenia testów zgodnie z Testing Pyramid:**
+
+### Testing Pyramid dla każdej US
+
+- **70% Unit Tests** - Funkcje serwisowe, utilities, hooks
+- **20% Integration Tests** - Komponenty, formularze, server actions
+- **10% E2E Tests** - Krytyczne ścieżki użytkownika
+
+### Wymagania testowe per US
+
+Dla każdej implementowanej User Story należy utworzyć:
+
+1. **Unit Tests** (Wymagane)
+
+   - Testy dla funkcji w `services/*.ts`
+   - Testy dla funkcji w `lib/*.ts`
+   - Testy dla custom hooks w `hooks/*.ts`
+
+2. **Integration Tests** (Wymagane)
+
+   - Testy renderowania komponentów
+   - Testy walidacji formularzy
+   - Testy interakcji użytkownika
+   - Testy server actions
+
+3. **E2E Tests** (Opcjonalne, dla krytycznych flow)
+   - Pełne ścieżki użytkownika
+   - Cross-page interactions
+
+### Definition of Done dla testów
+
+Feature jest uznany za "przetestowany" gdy:
+
+- ✅ Wszystkie funkcje serwisowe mają unit testy
+- ✅ Wszystkie komponenty mają integration testy
+- ✅ Wszystka logika walidacji jest przetestowana
+- ✅ Przypadki błędów są pokryte
+- ✅ Krytyczne flow mają E2E testy (jeśli dotyczy)
+- ✅ Testy przechodzą w CI/CD
+- ✅ Coverage spełnia minimalne progi (70%+)
+
+**Szczegółowe wytyczne:** Zobacz `docs/TESTING_GUIDELINES.md`
+
+---
+
 ## 3. Zakres PoC
 
 ### ✅ In Scope (PoC MVP)
@@ -225,6 +299,7 @@
 - ✅ Lista odświeża się po dodaniu
 - ⏳ Można edytować transakcję
 - ⏳ Można usunąć transakcję
+- ⏳ **Testy:** Unit testy dla services, integration testy dla komponentów, E2E dla krytycznych flow
 
 **Ryzyka:**
 | Ryzyko | Mitigacja |
@@ -250,6 +325,7 @@
 - Można tworzyć, edytować, usuwać kategorie
 - Transakcje można przypisywać do kategorii
 - Usunięcie kategorii nie psuje transakcji
+- **Testy:** Unit testy dla category services, integration testy dla CRUD komponentów
 
 **Ryzyka:**
 | Ryzyko | Mitigacja |
@@ -274,6 +350,7 @@
 - Filtry działają poprawnie i łączą się (AND)
 - Dashboard pokazuje poprawne sumy dla wybranego okresu
 - Waluta wpływa na formatowanie w całej aplikacji
+- **Testy:** Unit testy dla summary services, integration testy dla filtrów i dashboardu
 
 **Ryzyka:**
 | Ryzyko | Mitigacja |
@@ -300,6 +377,7 @@
 - Wykresy renderują się poprawnie z danymi i bez
 - Aplikacja działa na mobile i desktop
 - Brak krytycznych bugów
+- **Testy:** Integration testy dla komponentów wykresów, E2E dla głównych flow
 
 **Ryzyka:**
 | Ryzyko | Mitigacja |
@@ -427,59 +505,61 @@ updateSettings(input: UpdateSettingsInput): Promise<Settings>
 
 ## 6. Checklista testów PoC
 
+> **Uwaga:** Każdy test powinien być zaimplementowany jako Unit/Integration/E2E zgodnie z Testing Pyramid. Zobacz `docs/TESTING_GUIDELINES.md` dla szczegółów.
+
 ### CRUD Transakcji
 
-| #   | Scenariusz                                        | Typ        |
-| --- | ------------------------------------------------- | ---------- |
-| T1  | ✅ Dodanie transakcji z poprawnymi danymi         | Happy path |
-| T2  | ✅ Dodanie transakcji – kwota = 0 → błąd          | Edge case  |
-| T3  | ✅ Dodanie transakcji – kwota ujemna → błąd       | Edge case  |
-| T4  | ✅ Dodanie transakcji – data z przyszłości → błąd | Edge case  |
-| T5  | ✅ Dodanie transakcji bez kategorii → sukces      | Happy path |
-| T6  | Edycja transakcji – zmiana wszystkich pól         | Happy path |
-| T7  | Usunięcie transakcji – potwierdzenie → sukces     | Happy path |
-| T8  | Usunięcie transakcji – anulowanie → brak zmian    | Edge case  |
+| #   | Scenariusz                                        | Typ        | Test Level               |
+| --- | ------------------------------------------------- | ---------- | ------------------------ |
+| T1  | ✅ Dodanie transakcji z poprawnymi danymi         | Happy path | Unit + Integration + E2E |
+| T2  | ✅ Dodanie transakcji – kwota = 0 → błąd          | Edge case  | Unit + Integration       |
+| T3  | ✅ Dodanie transakcji – kwota ujemna → błąd       | Edge case  | Unit + Integration       |
+| T4  | ✅ Dodanie transakcji – data z przyszłości → błąd | Edge case  | Unit + Integration       |
+| T5  | ✅ Dodanie transakcji bez kategorii → sukces      | Happy path | Unit + Integration       |
+| T6  | Edycja transakcji – zmiana wszystkich pól         | Happy path | Unit + Integration + E2E |
+| T7  | Usunięcie transakcji – potwierdzenie → sukces     | Happy path | Unit + Integration + E2E |
+| T8  | Usunięcie transakcji – anulowanie → brak zmian    | Edge case  | Integration              |
 
 ### CRUD Kategorii
 
-| #   | Scenariusz                                                | Typ        |
-| --- | --------------------------------------------------------- | ---------- |
-| T9  | Dodanie kategorii z unikalną nazwą                        | Happy path |
-| T10 | Dodanie kategorii – pusta nazwa → błąd                    | Edge case  |
-| T11 | Dodanie kategorii – duplikat nazwy → błąd                 | Edge case  |
-| T12 | Edycja kategorii – zmiana nazwy                           | Happy path |
-| T13 | Usunięcie kategorii bez transakcji                        | Happy path |
-| T14 | Usunięcie kategorii z transakcjami → transakcje mają null | Edge case  |
+| #   | Scenariusz                                                | Typ        | Test Level         |
+| --- | --------------------------------------------------------- | ---------- | ------------------ |
+| T9  | Dodanie kategorii z unikalną nazwą                        | Happy path | Unit + Integration |
+| T10 | Dodanie kategorii – pusta nazwa → błąd                    | Edge case  | Unit + Integration |
+| T11 | Dodanie kategorii – duplikat nazwy → błąd                 | Edge case  | Unit + Integration |
+| T12 | Edycja kategorii – zmiana nazwy                           | Happy path | Unit + Integration |
+| T13 | Usunięcie kategorii bez transakcji                        | Happy path | Unit + Integration |
+| T14 | Usunięcie kategorii z transakcjami → transakcje mają null | Edge case  | Unit + Integration |
 
 ### Filtrowanie
 
-| #   | Scenariusz                               | Typ        |
-| --- | ---------------------------------------- | ---------- |
-| T15 | Filtr po typie: tylko income             | Happy path |
-| T16 | Filtr po typie: tylko expense            | Happy path |
-| T17 | Filtr po kategorii                       | Happy path |
-| T18 | Filtr po dacie (preset: bieżący miesiąc) | Happy path |
-| T19 | Filtr po dacie (custom range)            | Happy path |
-| T20 | Kombinacja filtrów                       | Happy path |
-| T21 | Filtry bez wyników → "Brak transakcji"   | Edge case  |
+| #   | Scenariusz                               | Typ        | Test Level               |
+| --- | ---------------------------------------- | ---------- | ------------------------ |
+| T15 | Filtr po typie: tylko income             | Happy path | Unit + Integration       |
+| T16 | Filtr po typie: tylko expense            | Happy path | Unit + Integration       |
+| T17 | Filtr po kategorii                       | Happy path | Unit + Integration       |
+| T18 | Filtr po dacie (preset: bieżący miesiąc) | Happy path | Unit + Integration       |
+| T19 | Filtr po dacie (custom range)            | Happy path | Unit + Integration       |
+| T20 | Kombinacja filtrów                       | Happy path | Unit + Integration + E2E |
+| T21 | Filtry bez wyników → "Brak transakcji"   | Edge case  | Integration              |
 
 ### Podsumowanie i wykresy
 
-| #   | Scenariusz                                         | Typ        |
-| --- | -------------------------------------------------- | ---------- |
-| T22 | Dashboard pokazuje poprawne sumy                   | Happy path |
-| T23 | Dashboard dla okresu bez transakcji → wszystko = 0 | Edge case  |
-| T24 | Wykres kołowy – poprawne % kategorii               | Happy path |
-| T25 | Wykres kołowy – brak wydatków → empty state        | Edge case  |
-| T26 | Wykres słupkowy – poprawne wartości per miesiąc    | Happy path |
-| T27 | Wykres słupkowy – miesiąc bez danych → słupki = 0  | Edge case  |
+| #   | Scenariusz                                         | Typ        | Test Level         |
+| --- | -------------------------------------------------- | ---------- | ------------------ |
+| T22 | Dashboard pokazuje poprawne sumy                   | Happy path | Unit + Integration |
+| T23 | Dashboard dla okresu bez transakcji → wszystko = 0 | Edge case  | Unit + Integration |
+| T24 | Wykres kołowy – poprawne % kategorii               | Happy path | Unit + Integration |
+| T25 | Wykres kołowy – brak wydatków → empty state        | Edge case  | Integration        |
+| T26 | Wykres słupkowy – poprawne wartości per miesiąc    | Happy path | Unit + Integration |
+| T27 | Wykres słupkowy – miesiąc bez danych → słupki = 0  | Edge case  | Integration        |
 
 ### Ustawienia
 
-| #   | Scenariusz                                      | Typ        |
-| --- | ----------------------------------------------- | ---------- |
-| T28 | Zmiana waluty na EUR → formatowanie zmienia się | Happy path |
-| T29 | Waluta persystuje po odświeżeniu                | Happy path |
+| #   | Scenariusz                                      | Typ        | Test Level         |
+| --- | ----------------------------------------------- | ---------- | ------------------ |
+| T28 | Zmiana waluty na EUR → formatowanie zmienia się | Happy path | Unit + Integration |
+| T29 | Waluta persystuje po odświeżeniu                | Happy path | Integration + E2E  |
 
 ---
 
@@ -549,24 +629,27 @@ updateSettings(input: UpdateSettingsInput): Promise<Settings>
 1. ✅ **[Etap 1]** Zdefiniować schemat Drizzle (`src/db/schema.ts`) dla `transactions`, `categories`, `settings`
 2. ✅ **[Etap 1]** Skonfigurować `drizzle.config.ts` i wykonać `drizzle-kit push`
 3. ✅ **[Etap 1]** Stworzyć seed script (`src/db/seed.ts`) z danymi testowymi
-4. ✅ **[Etap 2]** Zaimplementować service layer dla transakcji (`services/transactions.ts`)
-5. ✅ **[Etap 2]** Zbudować `TransactionList` + `TransactionForm` components
-6. ⏳ **[Etap 2]** Dodać edycję transakcji (US-2)
-7. ⏳ **[Etap 2]** Dodać usuwanie transakcji z potwierdzeniem (US-3)
+4. ✅ **[Etap 1]** ✅ Skonfigurować środowisko testowe (Vitest, Playwright, test utilities)
+5. ✅ **[Etap 2]** Zaimplementować service layer dla transakcji (`services/transactions.ts`)
+6. ✅ **[Etap 2]** Zbudować `TransactionList` + `TransactionForm` components
+7. ⏳ **[Etap 2]** Utworzyć testy dla US-1 (unit + integration + E2E)
+8. ⏳ **[Etap 2]** Dodać edycję transakcji (US-2) + testy
+9. ⏳ **[Etap 2]** Dodać usuwanie transakcji z potwierdzeniem (US-3) + testy
 
 ---
 
 ## Podsumowanie technologii
 
-| Warstwa       | Technologia          |
-| ------------- | -------------------- |
-| Framework     | Next.js (App Router) |
-| UI Components | HeroUI               |
-| Styling       | TailwindCSS          |
-| Charts        | Recharts             |
-| Database      | SQLite / libSQL      |
-| ORM           | Drizzle ORM          |
-| Language      | TypeScript           |
+| Warstwa       | Technologia                                 |
+| ------------- | ------------------------------------------- |
+| Framework     | Next.js (App Router)                        |
+| UI Components | HeroUI                                      |
+| Styling       | TailwindCSS                                 |
+| Charts        | Recharts                                    |
+| Database      | SQLite / libSQL                             |
+| ORM           | Drizzle ORM                                 |
+| Language      | TypeScript                                  |
+| Testing       | Vitest + React Testing Library + Playwright |
 
 ---
 

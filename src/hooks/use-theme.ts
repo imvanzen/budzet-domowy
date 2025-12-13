@@ -6,7 +6,7 @@ export const useTheme = () => {
   const [theme, setTheme] = useState<Theme>(
     typeof window !== "undefined"
       ? (window.localStorage.getItem("theme") as Theme) || "dark"
-      : "dark"
+      : "dark",
   );
 
   useLayoutEffect(() => {

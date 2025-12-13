@@ -16,17 +16,17 @@
 
 ## 2. User Stories + Acceptance Criteria
 
-### US-1: Dodawanie transakcji
+### ✅ US-1: Dodawanie transakcji
 
 **Jako** użytkownik **chcę** dodać nową transakcję (przychód lub wydatek) **aby** rejestrować swoje finanse.
 
 **Acceptance Criteria:**
 
-1. Formularz zawiera pola: kwota, typ (income/expense), data, kategoria (opcjonalna), opis (opcjonalny).
-2. Kwota musi być > 0.
-3. Data nie może być z przyszłości.
-4. Po zapisie transakcja pojawia się na liście.
-5. Wyświetla się komunikat sukcesu.
+1. ✅ Formularz zawiera pola: kwota, typ (income/expense), data, kategoria (opcjonalna), opis (opcjonalny).
+2. ✅ Kwota musi być > 0.
+3. ✅ Data nie może być z przyszłości.
+4. ✅ Po zapisie transakcja pojawia się na liście.
+5. ✅ Wyświetla się komunikat sukcesu.
 
 ---
 
@@ -145,20 +145,20 @@
 
 ### ✅ In Scope (PoC MVP)
 
-| #   | Feature                                                |
-| --- | ------------------------------------------------------ |
-| 1   | CRUD transakcji (income/expense)                       |
-| 2   | CRUD kategorii (wspólne dla income/expense)            |
-| 3   | Lista transakcji z filtrowaniem (data, typ, kategoria) |
-| 4   | Dashboard z podsumowaniem (przychody, wydatki, bilans) |
-| 5   | Wykres kołowy wydatków wg kategorii                    |
-| 6   | Wykres słupkowy przychody vs wydatki per miesiąc       |
-| 7   | Komponent Select Period (presety + custom range)       |
-| 8   | Ustawienia waluty (PLN/EUR/USD) – tylko formatowanie   |
-| 9   | Walidacja danych (kwota > 0, data ≤ dziś)              |
-| 10  | Persystencja w SQLite/libSQL via Drizzle               |
-| 11  | UI w Next.js + HeroUI + TailwindCSS                    |
-| 12  | Wykresy via Recharts                                   |
+| #   | Feature                                                                        |
+| --- | ------------------------------------------------------------------------------ |
+| 1   | 🔄 CRUD transakcji (income/expense) - Create ✅, Read ✅, Update ⏳, Delete ⏳ |
+| 2   | CRUD kategorii (wspólne dla income/expense)                                    |
+| 3   | Lista transakcji z filtrowaniem (data, typ, kategoria)                         |
+| 4   | Dashboard z podsumowaniem (przychody, wydatki, bilans)                         |
+| 5   | Wykres kołowy wydatków wg kategorii                                            |
+| 6   | Wykres słupkowy przychody vs wydatki per miesiąc                               |
+| 7   | Komponent Select Period (presety + custom range)                               |
+| 8   | Ustawienia waluty (PLN/EUR/USD) – tylko formatowanie                           |
+| 9   | ✅ Walidacja danych (kwota > 0, data ≤ dziś)                                   |
+| 10  | ✅ Persystencja w SQLite/libSQL via Drizzle                                    |
+| 11  | ✅ UI w Next.js + HeroUI + TailwindCSS                                         |
+| 12  | Wykresy via Recharts                                                           |
 
 ### ❌ Out of Scope
 
@@ -181,22 +181,22 @@
 
 ## 4. Plan prac – Etapy
 
-### Etap 1: Setup projektu + Model danych
+### ✅ Etap 1: Setup projektu + Model danych
 
 **Czas:** ~1 dzień
 
 **Deliverables:**
 
-- Projekt Next.js skonfigurowany z HeroUI + TailwindCSS
-- Drizzle ORM + libSQL/SQLite zainicjowane
-- Schemat bazy: `transactions`, `categories`, `settings`
-- Seed data załadowane
+- ✅ Projekt Next.js skonfigurowany z HeroUI + TailwindCSS
+- ✅ Drizzle ORM + libSQL/SQLite zainicjowane
+- ✅ Schemat bazy: `transactions`, `categories`, `settings`
+- ✅ Seed data załadowane
 
 **Definition of Done:**
 
-- `npx drizzle-kit push` wykonuje się bez błędów
-- `npx tsx src/db/seed.ts` ładuje przykładowe dane
-- Aplikacja uruchamia się (`npm run dev`)
+- ✅ `npx drizzle-kit push` wykonuje się bez błędów
+- ✅ `npx tsx src/db/seed.ts` ładuje przykładowe dane
+- ✅ Aplikacja uruchamia się (`npm run dev`)
 
 **Ryzyka:**
 | Ryzyko | Mitigacja |
@@ -206,22 +206,25 @@
 
 ---
 
-### Etap 2: CRUD Transakcji
+### 🔄 Etap 2: CRUD Transakcji (w trakcie)
 
 **Czas:** ~2 dni
 
 **Deliverables:**
 
-- Strona listy transakcji (`/transactions`)
-- Formularz dodawania/edycji transakcji (modal lub osobna strona)
-- Usuwanie z potwierdzeniem
-- Walidacja po stronie klienta i serwera
+- ✅ Strona listy transakcji (`/transactions`)
+- ✅ Formularz dodawania transakcji
+- ⏳ Formularz edycji transakcji
+- ⏳ Usuwanie z potwierdzeniem
+- ✅ Walidacja po stronie klienta i serwera
 
 **Definition of Done:**
 
-- Można dodać, edytować, usunąć transakcję
-- Walidacja blokuje nieprawidłowe dane
-- Lista odświeża się po każdej operacji
+- ✅ Można dodać transakcję
+- ✅ Walidacja blokuje nieprawidłowe dane
+- ✅ Lista odświeża się po dodaniu
+- ⏳ Można edytować transakcję
+- ⏳ Można usunąć transakcję
 
 **Ryzyka:**
 | Ryzyko | Mitigacja |
@@ -426,16 +429,16 @@ updateSettings(input: UpdateSettingsInput): Promise<Settings>
 
 ### CRUD Transakcji
 
-| #   | Scenariusz                                     | Typ        |
-| --- | ---------------------------------------------- | ---------- |
-| T1  | Dodanie transakcji z poprawnymi danymi         | Happy path |
-| T2  | Dodanie transakcji – kwota = 0 → błąd          | Edge case  |
-| T3  | Dodanie transakcji – kwota ujemna → błąd       | Edge case  |
-| T4  | Dodanie transakcji – data z przyszłości → błąd | Edge case  |
-| T5  | Dodanie transakcji bez kategorii → sukces      | Happy path |
-| T6  | Edycja transakcji – zmiana wszystkich pól      | Happy path |
-| T7  | Usunięcie transakcji – potwierdzenie → sukces  | Happy path |
-| T8  | Usunięcie transakcji – anulowanie → brak zmian | Edge case  |
+| #   | Scenariusz                                        | Typ        |
+| --- | ------------------------------------------------- | ---------- |
+| T1  | ✅ Dodanie transakcji z poprawnymi danymi         | Happy path |
+| T2  | ✅ Dodanie transakcji – kwota = 0 → błąd          | Edge case  |
+| T3  | ✅ Dodanie transakcji – kwota ujemna → błąd       | Edge case  |
+| T4  | ✅ Dodanie transakcji – data z przyszłości → błąd | Edge case  |
+| T5  | ✅ Dodanie transakcji bez kategorii → sukces      | Happy path |
+| T6  | Edycja transakcji – zmiana wszystkich pól         | Happy path |
+| T7  | Usunięcie transakcji – potwierdzenie → sukces     | Happy path |
+| T8  | Usunięcie transakcji – anulowanie → brak zmian    | Edge case  |
 
 ### CRUD Kategorii
 
@@ -528,7 +531,7 @@ updateSettings(input: UpdateSettingsInput): Promise<Settings>
 
 | ID    | Story                     | Priorytet | Etap | AC (skrót)                  |
 | ----- | ------------------------- | --------- | ---- | --------------------------- |
-| US-1  | Dodawanie transakcji      | P0        | 2    | Formularz, walidacja, zapis |
+| US-1  | ✅ Dodawanie transakcji   | P0        | 2    | Formularz, walidacja, zapis |
 | US-2  | Edycja transakcji         | P0        | 2    | Prefill, walidacja, update  |
 | US-3  | Usuwanie transakcji       | P0        | 2    | Confirm modal, delete       |
 | US-4  | Lista transakcji + filtry | P0        | 2,4  | Lista, sortowanie, filtry   |
@@ -543,11 +546,13 @@ updateSettings(input: UpdateSettingsInput): Promise<Settings>
 
 ## 9. Next Actions (najbliższe kroki)
 
-1. **[Etap 1]** Zdefiniować schemat Drizzle (`src/db/schema.ts`) dla `transactions`, `categories`, `settings`
-2. **[Etap 1]** Skonfigurować `drizzle.config.ts` i wykonać `drizzle-kit push`
-3. **[Etap 1]** Stworzyć seed script (`src/db/seed.ts`) z danymi testowymi
-4. **[Etap 2]** Zaimplementować service layer dla transakcji (`services/transactions.ts`)
-5. **[Etap 2]** Zbudować `TransactionList` + `TransactionForm` components
+1. ✅ **[Etap 1]** Zdefiniować schemat Drizzle (`src/db/schema.ts`) dla `transactions`, `categories`, `settings`
+2. ✅ **[Etap 1]** Skonfigurować `drizzle.config.ts` i wykonać `drizzle-kit push`
+3. ✅ **[Etap 1]** Stworzyć seed script (`src/db/seed.ts`) z danymi testowymi
+4. ✅ **[Etap 2]** Zaimplementować service layer dla transakcji (`services/transactions.ts`)
+5. ✅ **[Etap 2]** Zbudować `TransactionList` + `TransactionForm` components
+6. ⏳ **[Etap 2]** Dodać edycję transakcji (US-2)
+7. ⏳ **[Etap 2]** Dodać usuwanie transakcji z potwierdzeniem (US-3)
 
 ---
 

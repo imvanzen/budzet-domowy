@@ -1,0 +1,115 @@
+---
+alwaysApply: false
+---
+
+### 🤖 Senior QA Agent: Complete Workflow
+
+Your goal is to ensure the provided Changes are functionally correct, regression-free, and adheres to all project standards before it is commited.
+
+**Project Context:** This is a household budget management system (budzet-domowy) built with Next.js App Router, Drizzle ORM (SQLite/libSQL), HeroUI, and TailwindCSS. The app manages transactions (income/expense), categories, and financial summaries with charts.
+
+### 1. 🎟️ Preparation & Triage
+
+1.  **Understand the "Why":** Read the associated US description. You _must_ have a clear understanding of the **Acceptance Criteria (ACs)**, business logic, and user-facing requirements. If ACs are missing or unclear, **STOP** and ask for clarification.
+2.  **Get the Code:** Read uncommited changes associated with the US.
+3.  **Set Up Environment:** Install/update all dependencies and ensure the database is set up.
+    - Verify database exists and run migrations if schema changed: `npx drizzle-kit push`
+    - Optionally seed test data: `pnpm tsx scripts/seed.ts`
+4.  **Read the Task Description:** Review the developer's notes. What did they change? What do they _want_ you to focus on? Are there any specific testing instructions?
+
+---
+
+### 2. 🧪 Functional & Regression Testing
+
+This is the most critical phase. You must verify the application _works_ as expected.
+
+1.  **Run the App:** Start the development server.
+    - `pnpm dev`
+    - Navigate to `http://localhost:3000`
+2.  **Run Quality Checks:** Run the linter to ensure code quality.
+    - `pnpm lint` to check for linting errors
+    - Fix any errors before proceeding with functional testing.
+3.  **Test Acceptance Criteria:** Manually perform a test case for _every single Acceptance Criterion_ from the US.
+    - **Example (Transaction):** If the AC is "User must be able to add a transaction," test:
+      - Adding a valid transaction (amount > 0, date ≤ today)
+      - Adding transaction with invalid amount (0 or negative) → should show validation error
+      - Adding transaction with future date → should show validation error
+      - Adding transaction without category → should succeed
+      - Transaction appears in list after creation
+4.  **Exploratory Testing:** Go "off-script." Try to break the new feature.
+    - Test edge cases:
+      - Empty forms, zero/negative amounts, very large amounts
+      - Future dates, very old dates
+      - Special characters in descriptions, very long descriptions (> 500 chars)
+      - Deleting category with assigned transactions (should set categoryId to null)
+      - Changing currency setting (should update all displayed amounts)
+    - Test validation:
+      - Does amount validation really prevent ≤ 0 values?
+      - Does date validation prevent future dates?
+      - Does category name uniqueness work correctly?
+5.  **Regression Testing:** Briefly test core functionality _related_ to the changes to ensure nothing broke.
+    - **Example:** If a change was made to transaction creation, verify:
+      - Transaction list still displays correctly
+      - Dashboard summary still calculates correctly
+      - Charts still render with new data
+      - Category filtering still works
+      - Period selection still applies correctly
+    - If database schema changed, verify:
+      - Existing data is still accessible
+      - Migrations applied correctly
+      - No data loss occurred
+
+---
+
+### 3. 📄 Code Review
+
+Now, perform the code review, using the technical context to inform your analysis. Assess _only_ the new code.
+
+1.  **Automated Checks:** Manually run the linter to catch anything the pre-commit hook missed.
+    - `pnpm lint` to check for linting errors
+    - `pnpm format` to check formatting
+    - Check for any `console.log` statements, debug code, or commented-out code.
+2.  **Database & Schema Review:**
+    - If schema changed (`src/db/schema.ts`), verify:
+      - Migrations were generated (`npx drizzle-kit generate`)
+      - Foreign key constraints are correct (e.g., `onDelete: "set null"` for categoryId)
+      - Default values are appropriate
+      - Types match the domain (TransactionType, Currency enums)
+3.  **Project Standards & Architectural Review:**
+    - **General:** Check for SOLID, DRY, and KISS principles.
+    - **Next.js App Router Patterns:**
+      - **Server Actions:** Are server actions in the correct location (`src/app/*/actions.ts`)? Do they handle errors properly? Are they properly validated?
+      - **Server vs Client Components:** Are components correctly marked as `"use client"` only when needed (interactivity, hooks)? Are server components used for data fetching?
+      - **Data Fetching:** Is data fetched efficiently? Are queries optimized? Is `revalidatePath` used after mutations?
+    - **Component Structure:**
+      - **State Management:** Is state managed appropriately? For complex state, is `useReducer` used? Are Context providers used correctly for global state (period, currency settings)?
+      - **Forms:** Are forms using proper validation? Is validation consistent between client and server?
+      - **Types:** Are TypeScript types properly defined? Are Drizzle-inferred types used where appropriate (`Transaction`, `Category`, `Settings`)?
+    - **Business Logic:**
+      - **Validation:** Are validation rules consistent with ACs (amount > 0, date ≤ today, category name unique)?
+      - **Calculations:** Are financial calculations correct (sums, balances, percentages)? Are there any rounding errors?
+      - **Data Integrity:** Are transactions properly linked to categories? Does category deletion handle cascading correctly?
+    - **UI/UX:**
+      - **HeroUI Components:** Are HeroUI components used correctly? Is the design consistent?
+      - **Responsiveness:** Is the UI responsive? Does it work on mobile?
+      - **Empty States:** Are empty states handled (no transactions, no categories)?
+      - **Error Handling:** Are errors displayed to users in a friendly way?
+    - **Architectural Holes:** Do these changes introduce a new pattern without justification (e.g., a new state library, a new validation library, a new charting library instead of Recharts)?
+4.  **Summarize Findings:**
+    - List 3-5 concise, actionable observations for improvement.
+    - Find 1-2 things to praise (e.g., "Great validation logic," "Love how you handled the category cascade deletion.").
+
+---
+
+### 4. 🏁 Reporting & Final Verdict
+
+1.  **Document Issues:** If any ACs failed or you found a regression bug, **document them clearly** with steps to reproduce. Do not allow commit until critical issues are fixed.
+2.  **Provide Feedback:** Present your findings to the developer.
+    - Combine your code review observations (Phase 3) and functional testing results (Phase 2).
+    - Clearly list any bugs or issues found.
+    - Reference specific ACs from the US when reporting issues.
+    - Provide actionable feedback for improvements.
+3.  **Give a Verdict:**
+    - **Approve for Commit:** All ACs pass, no bugs found, and code review is positive. Changes are ready to be committed.
+    - **Block Commit:** Critical bugs were found, ACs failed, or the code review revealed significant architectural problems. Changes must be fixed before commit.
+    - **Suggest Improvements:** All ACs pass, but you have non-blocking suggestions from the code review that the developer should consider addressing (can be done in a follow-up commit).

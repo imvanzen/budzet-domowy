@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Budżet Domowy
 
-## Getting Started
+System zarządzania budżetem domowym - aplikacja webowa do śledzenia przychodów i wydatków.
 
-First, run the development server:
+## Funkcjonalności
+
+- ✅ **Dashboard** - podsumowanie finansów z wykresami
+- ✅ **Transakcje** - dodawanie, edycja i usuwanie transakcji (przychody/wydatki)
+- ✅ **Kategorie** - zarządzanie kategoriami transakcji
+- ✅ **Filtry** - filtrowanie transakcji po dacie, typie i kategorii
+- ✅ **Wykresy** - wizualizacja wydatków i przychodów
+- ✅ **Ustawienia** - wybór waluty (PLN/EUR/USD)
+
+## Technologie
+
+- **Next.js 16** - React framework z App Router
+- **React 19** - UI library
+- **TypeScript** - type safety
+- **HeroUI** - komponenty UI
+- **TailwindCSS** - styling
+- **Drizzle ORM** - database ORM
+- **SQLite/libSQL** - lokalna baza danych
+- **Vitest** - unit & integration testing
+- **Playwright** - E2E testing
+
+## Instalacja
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Instalacja zależności
+pnpm install
+
+# Konfiguracja bazy danych
+# Utwórz plik .env.local z:
+# DB_FILE_NAME=file:./local.db
+
+# Inicjalizacja bazy danych
+pnpm drizzle-kit push
+
+# Załadowanie danych testowych
+pnpm seed
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Uruchomienie
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Development server
+pnpm dev
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Production build
+pnpm build
+pnpm start
+```
 
-## Learn More
+Aplikacja dostępna pod [http://localhost:3000](http://localhost:3000)
 
-To learn more about Next.js, take a look at the following resources:
+## Testy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+# Unit & Integration tests
+pnpm test
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# E2E tests
+pnpm test:e2e
 
-## Deploy on Vercel
+# Coverage
+pnpm test:coverage
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Struktura projektu
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+├── app/                    # Next.js App Router
+│   ├── page.tsx           # Dashboard
+│   ├── transactions/      # Strona transakcji
+│   ├── categories/        # Strona kategorii
+│   └── settings/          # Strona ustawień
+├── components/            # React components
+│   ├── dashboard/         # Komponenty dashboardu
+│   ├── transactions/      # Komponenty transakcji
+│   ├── categories/        # Komponenty kategorii
+│   ├── settings/          # Komponenty ustawień
+│   ├── shared/            # Współdzielone komponenty
+│   └── layout/            # Layout components
+├── services/              # Business logic
+├── db/                    # Database schema & client
+├── lib/                   # Utilities
+└── hooks/                 # Custom React hooks
+```
+
+## Dokumentacja
+
+Szczegółowa dokumentacja dostępna w katalogu `docs/`:
+
+- `POC_PLAN.md` - plan projektu i user stories
+- `VIEWS_DESCRIPTION.md` - opis widoków aplikacji
+- `TESTING_GUIDELINES.md` - wytyczne testowania
+- `DOCUMENTATION_TODO.md` - lista zadań dokumentacyjnych
+
+## Licencja
+
+Projekt edukacyjny

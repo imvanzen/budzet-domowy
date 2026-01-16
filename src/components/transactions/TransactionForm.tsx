@@ -1,25 +1,30 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 import { Textarea } from "@heroui/react";
-import { addTransaction } from "@/app/transactions/actions";
-import type { Category } from "@/db/schema";
+import { addTransaction, editTransaction } from "@/app/transactions/actions";
+import type { Category, Transaction } from "@/db/schema";
 
 interface TransactionFormProps {
   categories: Category[];
+  transaction?: Transaction;
   onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
 export function TransactionForm({
   categories,
+  transaction,
   onSuccess,
+  onCancel,
 }: TransactionFormProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const isEditMode = !!transaction;
 
   const [formData, setFormData] = useState<{
     amount: string;
@@ -34,6 +39,18 @@ export function TransactionForm({
     categoryId: "",
     description: "",
   });
+
+  useEffect(() => {
+    if (transaction) {
+      setFormData({
+        amount: transaction.amount.toString(),
+        type: transaction.type as "INCOME" | "EXPENSE",
+        date: new Date(transaction.date).toISOString().split("T")[0],
+        categoryId: transaction.categoryId || "",
+        description: transaction.description || "",
+      });
+    }
+  }, [transaction]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -72,29 +89,39 @@ export function TransactionForm({
     const transactionType: "INCOME" | "EXPENSE" = formData.type;
 
     startTransition(async () => {
-      const result = await addTransaction({
-        amount,
-        type: transactionType,
-        date: selectedDate,
-        categoryId: formData.categoryId || null,
-        description: formData.description || null,
-      });
+      const result = isEditMode
+        ? await editTransaction(transaction.id, {
+            amount,
+            type: transactionType,
+            date: selectedDate,
+            categoryId: formData.categoryId || null,
+            description: formData.description || null,
+          })
+        : await addTransaction({
+            amount,
+            type: transactionType,
+            date: selectedDate,
+            categoryId: formData.categoryId || null,
+            description: formData.description || null,
+          });
 
       if (result.success) {
         setSuccess(true);
-        // Reset form
-        setFormData({
-          amount: "",
-          type: "",
-          date: new Date().toISOString().split("T")[0],
-          categoryId: "",
-          description: "",
-        });
+        if (!isEditMode) {
+          // Reset form only for add mode
+          setFormData({
+            amount: "",
+            type: "",
+            date: new Date().toISOString().split("T")[0],
+            categoryId: "",
+            description: "",
+          });
+        }
         // Call onSuccess callback if provided
         setTimeout(() => {
           setSuccess(false);
           onSuccess?.();
-        }, 2000);
+        }, 1500);
       } else {
         setError(result.error);
       }
@@ -186,18 +213,33 @@ export function TransactionForm({
 
       {success && (
         <div className="rounded-lg bg-success-50 p-3 text-sm text-success">
-          Transakcja została dodana pomyślnie!
+          {isEditMode
+            ? "Transakcja została zaktualizowana!"
+            : "Transakcja została dodana pomyślnie!"}
         </div>
       )}
 
-      <Button
-        type="submit"
-        color="primary"
-        isLoading={isPending}
-        className="w-full"
-      >
-        {isPending ? "Dodawanie..." : "Dodaj transakcję"}
-      </Button>
+      <div className="flex gap-2">
+        {isEditMode && onCancel && (
+          <Button variant="light" onPress={onCancel} className="flex-1">
+            Anuluj
+          </Button>
+        )}
+        <Button
+          type="submit"
+          color="primary"
+          isLoading={isPending}
+          className={isEditMode ? "flex-1" : "w-full"}
+        >
+          {isPending
+            ? isEditMode
+              ? "Zapisywanie..."
+              : "Dodawanie..."
+            : isEditMode
+              ? "Zapisz"
+              : "Dodaj transakcję"}
+        </Button>
+      </div>
     </form>
   );
 }

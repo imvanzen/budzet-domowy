@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { TransactionForm } from "./TransactionForm";
 import { TransactionList } from "./TransactionList";
-import type { Transaction, Category } from "@/db/schema";
-import { Badge, Chip } from "@heroui/react";
+import { TransactionFilters } from "./TransactionFilters";
+import type { Transaction, Category, TransactionType } from "@/db/schema";
+import { Chip } from "@heroui/react";
+import { getFilteredTransactions } from "@/app/transactions/actions";
 
 type TransactionsManagerProps = {
   initialTransactions: Array<
@@ -20,6 +22,34 @@ export function TransactionsManager({
 }: TransactionsManagerProps) {
   const [editingTransaction, setEditingTransaction] =
     useState<Transaction | null>(null);
+  const [transactions, setTransactions] = useState(initialTransactions);
+  const [selectedType, setSelectedType] = useState<TransactionType | "ALL">("ALL");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | "ALL">("ALL");
+  const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    const fetchFilteredTransactions = () => {
+      startTransition(async () => {
+        const filters: { type?: TransactionType; categoryId?: string } = {};
+        
+        if (selectedType !== "ALL") {
+          filters.type = selectedType;
+        }
+        
+        if (selectedCategoryId !== "ALL") {
+          filters.categoryId = selectedCategoryId;
+        }
+
+        const filtered = await getFilteredTransactions(
+          Object.keys(filters).length > 0 ? filters : undefined
+        );
+        
+        setTransactions(filtered);
+      });
+    };
+
+    fetchFilteredTransactions();
+  }, [selectedType, selectedCategoryId]);
 
   const handleEdit = (transaction: Transaction) => {
     setEditingTransaction(transaction);
@@ -28,6 +58,24 @@ export function TransactionsManager({
 
   const handleSuccess = () => {
     setEditingTransaction(null);
+    // Refresh transactions after adding/editing
+    startTransition(async () => {
+      const filters: { type?: TransactionType; categoryId?: string } = {};
+      
+      if (selectedType !== "ALL") {
+        filters.type = selectedType;
+      }
+      
+      if (selectedCategoryId !== "ALL") {
+        filters.categoryId = selectedCategoryId;
+      }
+
+      const filtered = await getFilteredTransactions(
+        Object.keys(filters).length > 0 ? filters : undefined
+      );
+      
+      setTransactions(filtered);
+    });
   };
 
   const handleCancel = () => {
@@ -57,15 +105,31 @@ export function TransactionsManager({
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">Lista transakcji</h2>
             <Chip color="primary" size="sm" variant="solid">
-              {initialTransactions.length}
+              {transactions.length}
             </Chip>
           </div>
         </CardHeader>
         <CardBody>
-          <TransactionList
-            transactions={initialTransactions}
-            onEdit={handleEdit}
-          />
+          <div className="space-y-4">
+            <TransactionFilters
+              categories={categories}
+              selectedType={selectedType}
+              selectedCategoryId={selectedCategoryId}
+              onTypeChange={setSelectedType}
+              onCategoryChange={setSelectedCategoryId}
+            />
+            
+            {isPending && (
+              <div className="text-center text-default-500">Ładowanie...</div>
+            )}
+            
+            <div className={isPending ? "opacity-50" : ""}>
+              <TransactionList
+                transactions={transactions}
+                onEdit={handleEdit}
+              />
+            </div>
+          </div>
         </CardBody>
       </Card>
     </div>

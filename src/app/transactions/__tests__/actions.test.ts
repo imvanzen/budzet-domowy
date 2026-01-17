@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { addTransaction } from "../actions";
+import { addTransaction, editTransaction, removeTransaction } from "../actions";
 import { transactionType } from "@/db/schema";
 import * as transactionsService from "@/services/transactions";
 
 // Mock the transactions service
 vi.mock("@/services/transactions", () => ({
   createTransaction: vi.fn(),
+  updateTransaction: vi.fn(),
+  deleteTransaction: vi.fn(),
 }));
 
 // Mock next/cache
@@ -222,6 +224,135 @@ describe("addTransaction server action", () => {
       expect(result.success).toBe(false);
       expect(result.error).toBe("Wystąpił błąd podczas dodawania transakcji");
     });
+  });
+});
+
+describe("editTransaction server action", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe("validation", () => {
+    it("should reject transaction with amount <= 0", async () => {
+      const result = await editTransaction("test-id", {
+        amount: 0,
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Kwota musi być większa od 0");
+    });
+
+    it("should reject transaction with future date", async () => {
+      const futureDate = new Date();
+      futureDate.setDate(futureDate.getDate() + 1);
+
+      const result = await editTransaction("test-id", {
+        date: futureDate,
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Data nie może być z przyszłości");
+    });
+
+    it("should reject transaction with description > 500 characters", async () => {
+      const longDescription = "a".repeat(501);
+
+      const result = await editTransaction("test-id", {
+        description: longDescription,
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Opis nie może przekraczać 500 znaków");
+    });
+  });
+
+  describe("successful update", () => {
+    it("should update transaction with valid data", async () => {
+      vi.mocked(transactionsService.updateTransaction).mockResolvedValue({
+        id: "test-id",
+        amount: 200,
+        type: transactionType.INCOME,
+        date: new Date("2024-01-15"),
+        description: "Updated",
+        categoryId: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as any);
+
+      const result = await editTransaction("test-id", {
+        amount: 200,
+        description: "Updated",
+      });
+
+      expect(result.success).toBe(true);
+      expect(transactionsService.updateTransaction).toHaveBeenCalledWith(
+        "test-id",
+        {
+          amount: 200,
+          description: "Updated",
+        }
+      );
+    });
+
+    it("should allow partial updates", async () => {
+      vi.mocked(transactionsService.updateTransaction).mockResolvedValue({
+        id: "test-id",
+        amount: 100,
+        type: transactionType.INCOME,
+        date: new Date("2024-01-15"),
+        description: null,
+        categoryId: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as any);
+
+      const result = await editTransaction("test-id", {
+        amount: 150,
+      });
+
+      expect(result.success).toBe(true);
+    });
+  });
+
+  describe("error handling", () => {
+    it("should handle database errors gracefully", async () => {
+      vi.mocked(transactionsService.updateTransaction).mockRejectedValue(
+        new Error("Database error")
+      );
+
+      const result = await editTransaction("test-id", {
+        amount: 200,
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Wystąpił błąd podczas edycji transakcji");
+    });
+  });
+});
+
+describe("removeTransaction server action", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should delete transaction successfully", async () => {
+    vi.mocked(transactionsService.deleteTransaction).mockResolvedValue();
+
+    const result = await removeTransaction("test-id");
+
+    expect(result.success).toBe(true);
+    expect(transactionsService.deleteTransaction).toHaveBeenCalledWith("test-id");
+  });
+
+  it("should handle database errors gracefully", async () => {
+    vi.mocked(transactionsService.deleteTransaction).mockRejectedValue(
+      new Error("Database error")
+    );
+
+    const result = await removeTransaction("test-id");
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe("Wystąpił błąd podczas usuwania transakcji");
   });
 });
 

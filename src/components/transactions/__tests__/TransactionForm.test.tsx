@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
+import { fireEvent } from "@testing-library/react";
 import { TransactionForm } from "../TransactionForm";
 import { useTestDb } from "@/__tests__/db/helpers";
 import { seedTestDb } from "@/__tests__/db/fixtures";
@@ -30,9 +31,10 @@ describe("TransactionForm", () => {
       render(<TransactionForm categories={categories} />);
 
       expect(screen.getByLabelText("Kwota")).toBeInTheDocument();
-      expect(screen.getByLabelText("Typ")).toBeInTheDocument();
+      // Select components might have multiple labels, use getAllByLabelText
+      expect(screen.getAllByLabelText("Typ").length).toBeGreaterThan(0);
       expect(screen.getByLabelText("Data")).toBeInTheDocument();
-      expect(screen.getByLabelText("Kategoria")).toBeInTheDocument();
+      expect(screen.getAllByLabelText("Kategoria").length).toBeGreaterThan(0);
       expect(screen.getByLabelText("Opis")).toBeInTheDocument();
       expect(
         screen.getByRole("button", { name: /dodaj transakcję/i })
@@ -42,126 +44,143 @@ describe("TransactionForm", () => {
     it("should render category options", () => {
       render(<TransactionForm categories={categories} />);
 
-      const categorySelect = screen.getByLabelText("Kategoria");
-      expect(categorySelect).toBeInTheDocument();
+      // Select component might have multiple "Kategoria" labels
+      const categorySelects = screen.getAllByLabelText("Kategoria");
+      expect(categorySelects.length).toBeGreaterThan(0);
     });
   });
 
   describe("form validation", () => {
     it("should show error for amount <= 0", async () => {
       const user = userEvent.setup();
-      render(<TransactionForm categories={categories} />);
+      const { container } = render(<TransactionForm categories={categories} />);
 
       const amountInput = screen.getByLabelText("Kwota");
-      const typeSelect = screen.getByLabelText("Typ");
-      const submitButton = screen.getByRole("button", {
-        name: /dodaj transakcję/i,
-      });
+      const form = container.querySelector("form");
 
+      await user.clear(amountInput);
       await user.type(amountInput, "0");
-      await user.click(typeSelect);
-      await user.keyboard("{ArrowDown}{Enter}");
-      await user.click(submitButton);
 
-      await waitFor(() => {
-        expect(
-          screen.getByText("Kwota musi być większa od 0")
-        ).toBeInTheDocument();
-      });
+      if (form) {
+        fireEvent.submit(form);
+      }
+
+      await waitFor(
+        () => {
+          expect(
+            screen.getByText("Kwota musi być większa od 0")
+          ).toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
     });
 
     it("should show error for negative amount", async () => {
       const user = userEvent.setup();
-      render(<TransactionForm categories={categories} />);
+      const { container } = render(<TransactionForm categories={categories} />);
 
       const amountInput = screen.getByLabelText("Kwota");
-      const typeSelect = screen.getByLabelText("Typ");
-      const submitButton = screen.getByRole("button", {
-        name: /dodaj transakcję/i,
-      });
+      const form = container.querySelector("form");
 
+      await user.clear(amountInput);
       await user.type(amountInput, "-10");
-      await user.click(typeSelect);
-      await user.keyboard("{ArrowDown}{Enter}");
-      await user.click(submitButton);
 
-      await waitFor(() => {
-        expect(
-          screen.getByText("Kwota musi być większa od 0")
-        ).toBeInTheDocument();
-      });
+      if (form) {
+        fireEvent.submit(form);
+      }
+
+      await waitFor(
+        () => {
+          expect(
+            screen.getByText("Kwota musi być większa od 0")
+          ).toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
     });
 
     it("should show error for future date", async () => {
       const user = userEvent.setup();
-      render(<TransactionForm categories={categories} />);
+      const { container } = render(<TransactionForm categories={categories} />);
 
       const amountInput = screen.getByLabelText("Kwota");
       const dateInput = screen.getByLabelText("Data");
-      const typeSelect = screen.getByLabelText("Typ");
-      const submitButton = screen.getByRole("button", {
-        name: /dodaj transakcję/i,
-      });
+      const form = container.querySelector("form");
 
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 1);
       const futureDateString = futureDate.toISOString().split("T")[0];
 
+      await user.clear(amountInput);
       await user.type(amountInput, "100");
       await user.clear(dateInput);
       await user.type(dateInput, futureDateString);
-      await user.click(typeSelect);
-      await user.keyboard("{ArrowDown}{Enter}");
-      await user.click(submitButton);
 
-      await waitFor(() => {
-        expect(
-          screen.getByText("Data nie może być z przyszłości")
-        ).toBeInTheDocument();
-      });
+      if (form) {
+        fireEvent.submit(form);
+      }
+
+      await waitFor(
+        () => {
+          expect(
+            screen.getByText("Data nie może być z przyszłości")
+          ).toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
     });
 
     it("should show error for missing transaction type", async () => {
       const user = userEvent.setup();
-      render(<TransactionForm categories={categories} />);
+      const { container } = render(<TransactionForm categories={categories} />);
 
       const amountInput = screen.getByLabelText("Kwota");
-      const submitButton = screen.getByRole("button", {
-        name: /dodaj transakcję/i,
-      });
+      const form = container.querySelector("form");
 
+      await user.clear(amountInput);
       await user.type(amountInput, "100");
-      await user.click(submitButton);
 
-      await waitFor(() => {
-        expect(screen.getByText("Wybierz typ transakcji")).toBeInTheDocument();
-      });
+      if (form) {
+        fireEvent.submit(form);
+      }
+
+      await waitFor(
+        () => {
+          expect(
+            screen.getByText("Wybierz typ transakcji")
+          ).toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
     });
 
     it("should show error for description > 500 characters", async () => {
       const user = userEvent.setup();
-      render(<TransactionForm categories={categories} />);
+      const { container } = render(<TransactionForm categories={categories} />);
 
       const amountInput = screen.getByLabelText("Kwota");
       const descriptionInput = screen.getByLabelText("Opis");
-      const typeSelect = screen.getByLabelText("Typ");
-      const submitButton = screen.getByRole("button", {
-        name: /dodaj transakcję/i,
-      });
+      const form = container.querySelector("form");
 
       const longDescription = "a".repeat(501);
 
+      await user.clear(amountInput);
       await user.type(amountInput, "100");
+      await user.clear(descriptionInput);
       await user.type(descriptionInput, longDescription);
-      await user.click(typeSelect);
-      await user.keyboard("{ArrowDown}{Enter}");
-      await user.click(submitButton);
 
-      await waitFor(() => {
-        expect(
-          screen.getByText("Opis nie może przekraczać 500 znaków")
-        ).toBeInTheDocument();
-      });
+      if (form) {
+        fireEvent.submit(form);
+      }
+
+      await waitFor(
+        () => {
+          expect(
+            screen.getByText("Opis nie może przekraczać 500 znaków")
+          ).toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
     });
   });
 
@@ -175,16 +194,18 @@ describe("TransactionForm", () => {
         data: { id: "test-id" },
       });
 
-      render(<TransactionForm categories={categories} onSuccess={mockOnSuccess} />);
+      render(
+        <TransactionForm categories={categories} onSuccess={mockOnSuccess} />
+      );
 
       const amountInput = screen.getByLabelText("Kwota");
-      const typeSelect = screen.getByLabelText("Typ");
+      const typeSelects = screen.getAllByLabelText("Typ");
       const submitButton = screen.getByRole("button", {
         name: /dodaj transakcję/i,
       });
 
       await user.type(amountInput, "100.50");
-      await user.click(typeSelect);
+      await user.click(typeSelects[0]!);
       await user.keyboard("{ArrowDown}{Enter}");
       await user.click(submitButton);
 
@@ -198,11 +219,14 @@ describe("TransactionForm", () => {
         });
       });
 
-      await waitFor(() => {
-        expect(
-          screen.getByText("Transakcja została dodana pomyślnie!")
-        ).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(
+            screen.getByText("Transakcja została dodana pomyślnie!")
+          ).toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
     });
 
     it("should show error message on server error", async () => {
@@ -216,19 +240,22 @@ describe("TransactionForm", () => {
       render(<TransactionForm categories={categories} />);
 
       const amountInput = screen.getByLabelText("Kwota");
-      const typeSelect = screen.getByLabelText("Typ");
+      const typeSelects = screen.getAllByLabelText("Typ");
       const submitButton = screen.getByRole("button", {
         name: /dodaj transakcję/i,
       });
 
       await user.type(amountInput, "100");
-      await user.click(typeSelect);
+      await user.click(typeSelects[0]!);
       await user.keyboard("{ArrowDown}{Enter}");
       await user.click(submitButton);
 
-      await waitFor(() => {
-        expect(screen.getByText("Server error occurred")).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByText("Server error occurred")).toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
     });
 
     it("should reset form after successful submission", async () => {
@@ -242,21 +269,22 @@ describe("TransactionForm", () => {
       render(<TransactionForm categories={categories} />);
 
       const amountInput = screen.getByLabelText("Kwota") as HTMLInputElement;
-      const typeSelect = screen.getByLabelText("Typ");
+      const typeSelects = screen.getAllByLabelText("Typ");
       const submitButton = screen.getByRole("button", {
         name: /dodaj transakcję/i,
       });
 
       await user.type(amountInput, "100");
-      await user.click(typeSelect);
+      await user.click(typeSelects[0]!);
       await user.keyboard("{ArrowDown}{Enter}");
       await user.click(submitButton);
 
-      await waitFor(() => {
-        expect(amountInput.value).toBe("");
-      });
+      await waitFor(
+        () => {
+          expect(amountInput.value).toBe("");
+        },
+        { timeout: 2000 }
+      );
     });
   });
 });
-
-

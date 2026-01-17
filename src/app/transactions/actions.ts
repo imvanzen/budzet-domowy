@@ -1,8 +1,8 @@
 "use server";
 
-import { createTransaction, updateTransaction, deleteTransaction } from "@/services/transactions";
+import { createTransaction, updateTransaction, deleteTransaction, getTransactions, type TransactionFilters } from "@/services/transactions";
 import { revalidatePath } from "next/cache";
-import type { NewTransaction } from "@/db/schema";
+import type { NewTransaction, Transaction } from "@/db/schema";
 
 export type ActionResult =
   | { success: true; data?: { id: string } }
@@ -93,4 +93,10 @@ export async function removeTransaction(id: string): Promise<ActionResult> {
       error: "Wystąpił błąd podczas usuwania transakcji",
     };
   }
+}
+
+export async function getFilteredTransactions(
+  filters?: TransactionFilters
+): Promise<Array<Transaction & { category: { name: string } | null }>> {
+  return getTransactions(filters);
 }

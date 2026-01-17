@@ -12,7 +12,11 @@ interface CategoryFormProps {
   onCancel?: () => void;
 }
 
-export function CategoryForm({ category, onSuccess, onCancel }: CategoryFormProps) {
+export function CategoryForm({
+  category,
+  onSuccess,
+  onCancel,
+}: CategoryFormProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -62,14 +66,12 @@ export function CategoryForm({ category, onSuccess, onCancel }: CategoryFormProp
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
       <Input
         label="Nazwa"
         value={name}
         onValueChange={setName}
         placeholder="Nazwa kategorii"
-        isRequired
-        maxLength={100}
         description={`${name.length}/100 znaków`}
       />
 
@@ -104,11 +106,10 @@ export function CategoryForm({ category, onSuccess, onCancel }: CategoryFormProp
               ? "Zapisywanie..."
               : "Dodawanie..."
             : isEditMode
-              ? "Zapisz"
-              : "Dodaj Kategorię"}
+            ? "Zapisz"
+            : "Dodaj Kategorię"}
         </Button>
       </div>
     </form>
   );
 }
-

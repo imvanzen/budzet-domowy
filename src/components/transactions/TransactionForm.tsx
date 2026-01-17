@@ -129,14 +129,12 @@ export function TransactionForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
           label="Kwota"
           type="number"
           step="0.01"
-          min="0.01"
-          isRequired
           value={formData.amount}
           onValueChange={(value) =>
             setFormData((prev) => ({ ...prev, amount: value }))
@@ -147,7 +145,6 @@ export function TransactionForm({
 
         <Select
           label="Typ"
-          isRequired
           selectedKeys={formData.type ? [formData.type] : []}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0] as string;
@@ -167,12 +164,10 @@ export function TransactionForm({
         <Input
           label="Data"
           type="date"
-          isRequired
           value={formData.date}
           onValueChange={(value) =>
             setFormData((prev) => ({ ...prev, date: value }))
           }
-          max={new Date().toISOString().split("T")[0]}
           description="Data nie może być z przyszłości"
         />
 
@@ -201,7 +196,6 @@ export function TransactionForm({
           setFormData((prev) => ({ ...prev, description: value }))
         }
         placeholder="Opcjonalny opis transakcji"
-        maxLength={500}
         description={`${formData.description.length}/500 znaków`}
       />
 

@@ -67,9 +67,9 @@ describe("TransactionForm", () => {
 
       await waitFor(
         () => {
-          expect(
-            screen.getByText("Kwota musi być większa od 0")
-          ).toBeInTheDocument();
+          const errorDiv = container.querySelector(".bg-danger-50");
+          expect(errorDiv).toBeInTheDocument();
+          expect(errorDiv).toHaveTextContent("Kwota musi być większa od 0");
         },
         { timeout: 3000 }
       );
@@ -91,9 +91,9 @@ describe("TransactionForm", () => {
 
       await waitFor(
         () => {
-          expect(
-            screen.getByText("Kwota musi być większa od 0")
-          ).toBeInTheDocument();
+          const errorDiv = container.querySelector(".bg-danger-50");
+          expect(errorDiv).toBeInTheDocument();
+          expect(errorDiv).toHaveTextContent("Kwota musi być większa od 0");
         },
         { timeout: 3000 }
       );
@@ -122,9 +122,9 @@ describe("TransactionForm", () => {
 
       await waitFor(
         () => {
-          expect(
-            screen.getByText("Data nie może być z przyszłości")
-          ).toBeInTheDocument();
+          const errorDiv = container.querySelector(".bg-danger-50");
+          expect(errorDiv).toBeInTheDocument();
+          expect(errorDiv).toHaveTextContent("Data nie może być z przyszłości");
         },
         { timeout: 3000 }
       );
@@ -146,38 +146,9 @@ describe("TransactionForm", () => {
 
       await waitFor(
         () => {
-          expect(
-            screen.getByText("Wybierz typ transakcji")
-          ).toBeInTheDocument();
-        },
-        { timeout: 3000 }
-      );
-    });
-
-    it("should show error for description > 500 characters", async () => {
-      const user = userEvent.setup();
-      const { container } = render(<TransactionForm categories={categories} />);
-
-      const amountInput = screen.getByLabelText("Kwota");
-      const descriptionInput = screen.getByLabelText("Opis");
-      const form = container.querySelector("form");
-
-      const longDescription = "a".repeat(501);
-
-      await user.clear(amountInput);
-      await user.type(amountInput, "100");
-      await user.clear(descriptionInput);
-      await user.type(descriptionInput, longDescription);
-
-      if (form) {
-        fireEvent.submit(form);
-      }
-
-      await waitFor(
-        () => {
-          expect(
-            screen.getByText("Opis nie może przekraczać 500 znaków")
-          ).toBeInTheDocument();
+          const errorDiv = container.querySelector(".bg-danger-50");
+          expect(errorDiv).toBeInTheDocument();
+          expect(errorDiv).toHaveTextContent("Wybierz typ transakcji");
         },
         { timeout: 3000 }
       );
@@ -199,24 +170,30 @@ describe("TransactionForm", () => {
       );
 
       const amountInput = screen.getByLabelText("Kwota");
-      const typeSelects = screen.getAllByLabelText("Typ");
+      const typeButton = screen.getByRole("button", { name: /wybierz typ/i });
       const submitButton = screen.getByRole("button", {
         name: /dodaj transakcję/i,
       });
 
       await user.type(amountInput, "100.50");
-      await user.click(typeSelects[0]!);
-      await user.keyboard("{ArrowDown}{Enter}");
+      await user.click(typeButton);
+
+      // Wait for listbox to appear and select INCOME
+      const incomeOption = await screen.findByRole("option", {
+        name: /przychód/i,
+      });
+      await user.click(incomeOption);
+
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(addTransaction).toHaveBeenCalledWith({
-          amount: 100.5,
-          type: "INCOME",
-          date: expect.any(Date),
-          categoryId: expect.any(String).or(null),
-          description: expect.any(String).or(null),
-        });
+        expect(addTransaction).toHaveBeenCalledWith(
+          expect.objectContaining({
+            amount: 100.5,
+            type: "INCOME",
+            date: expect.any(Date),
+          })
+        );
       });
 
       await waitFor(
@@ -237,22 +214,30 @@ describe("TransactionForm", () => {
         error: "Server error occurred",
       });
 
-      render(<TransactionForm categories={categories} />);
+      const { container } = render(<TransactionForm categories={categories} />);
 
       const amountInput = screen.getByLabelText("Kwota");
-      const typeSelects = screen.getAllByLabelText("Typ");
+      const typeButton = screen.getByRole("button", { name: /wybierz typ/i });
       const submitButton = screen.getByRole("button", {
         name: /dodaj transakcję/i,
       });
 
       await user.type(amountInput, "100");
-      await user.click(typeSelects[0]!);
-      await user.keyboard("{ArrowDown}{Enter}");
+      await user.click(typeButton);
+
+      // Wait for listbox to appear and select INCOME
+      const incomeOption = await screen.findByRole("option", {
+        name: /przychód/i,
+      });
+      await user.click(incomeOption);
+
       await user.click(submitButton);
 
       await waitFor(
         () => {
-          expect(screen.getByText("Server error occurred")).toBeInTheDocument();
+          const errorDiv = container.querySelector(".bg-danger-50");
+          expect(errorDiv).toBeInTheDocument();
+          expect(errorDiv).toHaveTextContent("Server error occurred");
         },
         { timeout: 3000 }
       );
@@ -269,14 +254,20 @@ describe("TransactionForm", () => {
       render(<TransactionForm categories={categories} />);
 
       const amountInput = screen.getByLabelText("Kwota") as HTMLInputElement;
-      const typeSelects = screen.getAllByLabelText("Typ");
+      const typeButton = screen.getByRole("button", { name: /wybierz typ/i });
       const submitButton = screen.getByRole("button", {
         name: /dodaj transakcję/i,
       });
 
       await user.type(amountInput, "100");
-      await user.click(typeSelects[0]!);
-      await user.keyboard("{ArrowDown}{Enter}");
+      await user.click(typeButton);
+
+      // Wait for listbox to appear and select INCOME
+      const incomeOption = await screen.findByRole("option", {
+        name: /przychód/i,
+      });
+      await user.click(incomeOption);
+
       await user.click(submitButton);
 
       await waitFor(

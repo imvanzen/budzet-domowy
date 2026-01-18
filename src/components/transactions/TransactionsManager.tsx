@@ -5,7 +5,7 @@ import { Card, CardBody, CardHeader } from "@heroui/card";
 import { TransactionForm } from "./TransactionForm";
 import { TransactionList } from "./TransactionList";
 import { TransactionFilters } from "./TransactionFilters";
-import type { Transaction, Category, TransactionType } from "@/db/schema";
+import type { Transaction, Category, TransactionType, Currency } from "@/db/schema";
 import { Chip } from "@heroui/react";
 import { getFilteredTransactions } from "@/app/transactions/actions";
 
@@ -14,11 +14,13 @@ type TransactionsManagerProps = {
     Transaction & { category: { name: string } | null }
   >;
   categories: Category[];
+  currency: Currency;
 };
 
 export function TransactionsManager({
   initialTransactions,
   categories,
+  currency,
 }: TransactionsManagerProps) {
   const [editingTransaction, setEditingTransaction] =
     useState<Transaction | null>(null);
@@ -127,6 +129,7 @@ export function TransactionsManager({
               <TransactionList
                 transactions={transactions}
                 onEdit={handleEdit}
+                currency={currency}
               />
             </div>
           </div>

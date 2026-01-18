@@ -4,18 +4,20 @@ import { useState } from "react";
 import { Button } from "@heroui/button";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { transactionType } from "@/db/schema";
-import type { Transaction } from "@/db/schema";
+import type { Transaction, Currency } from "@/db/schema";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
 import { removeTransaction } from "@/app/transactions/actions";
 
 interface TransactionListProps {
   transactions: Array<Transaction & { category: { name: string } | null }>;
   onEdit?: (transaction: Transaction) => void;
+  currency: Currency;
 }
 
 export function TransactionList({
   transactions,
   onEdit,
+  currency,
 }: TransactionListProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -84,7 +86,7 @@ export function TransactionList({
                 }`}
               >
                 {transaction.type === transactionType.INCOME ? "+" : "-"}
-                {formatCurrency(transaction.amount)}
+                {formatCurrency(transaction.amount, currency)}
               </p>
               {onEdit && (
                 <Button

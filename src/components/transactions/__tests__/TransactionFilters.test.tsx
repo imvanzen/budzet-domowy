@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@/__tests__/test-utils";
-import userEvent from "@testing-library/user-event";
 import { TransactionFilters } from "../TransactionFilters";
 import type { Category } from "@/db/schema";
 

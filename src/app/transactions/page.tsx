@@ -1,12 +1,14 @@
 import { Suspense } from "react";
 import { getTransactions } from "@/services/transactions";
 import { getCategories } from "@/services/categories";
+import { getSettings } from "@/services/settings";
 import { TransactionsManager } from "@/components/transactions/TransactionsManager";
 
 async function TransactionsContent() {
-  const [transactions, categories] = await Promise.all([
+  const [transactions, categories, settings] = await Promise.all([
     getTransactions(),
     getCategories(),
+    getSettings(),
   ]);
 
   return (
@@ -15,7 +17,11 @@ async function TransactionsContent() {
         <h1 className="text-3xl font-bold">Transakcje</h1>
       </div>
 
-      <TransactionsManager initialTransactions={transactions} categories={categories} />
+      <TransactionsManager 
+        initialTransactions={transactions} 
+        categories={categories}
+        currency={settings.currency}
+      />
     </div>
   );
 }

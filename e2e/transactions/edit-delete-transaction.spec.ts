@@ -134,3 +134,4 @@ test.describe("US-2 & US-3: Edycja i usuwanie transakcji", () => {
     ).toBeVisible();
   });
 });
+

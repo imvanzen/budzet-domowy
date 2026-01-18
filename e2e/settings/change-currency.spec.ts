@@ -59,3 +59,4 @@ test.describe("US-10: Ustawienia waluty", () => {
     await expect(page).toHaveURL("/settings");
   });
 });
+

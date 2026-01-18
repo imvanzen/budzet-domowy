@@ -44,14 +44,17 @@ export function TransactionFilters({
         }}
         placeholder="Wszystkie"
       >
-        <SelectItem key="ALL">Wszystkie</SelectItem>
-        {categories.map((category) => (
-          <SelectItem key={category.id} value={category.id}>
-            {category.name}
+        {[
+          { id: "ALL", name: "Wszystkie" },
+          ...categories,
+        ].map((item) => (
+          <SelectItem key={item.id}>
+            {item.name}
           </SelectItem>
         ))}
       </Select>
     </div>
   );
 }
+
 

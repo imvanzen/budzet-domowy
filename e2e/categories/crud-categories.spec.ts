@@ -127,3 +127,4 @@ test.describe("US-5: Zarządzanie kategoriami", () => {
     await expect(page.locator("text=To Keep")).toBeVisible();
   });
 });
+

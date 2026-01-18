@@ -7,10 +7,6 @@ import {
   settings,
 } from "@/db/schema";
 
-/**
- * Test data fixtures for consistent test setup
- */
-
 export const testCategories: NewCategory[] = [
   {
     id: "cat-1",
@@ -61,9 +57,6 @@ export const testSettings: NewSettings = {
 import type { LibSQLDatabase } from "drizzle-orm/libsql";
 import type * as schema from "@/db/schema";
 
-/**
- * Helper to seed test database with fixtures
- */
 export async function seedTestDb(
   db: LibSQLDatabase<typeof schema>
 ) {

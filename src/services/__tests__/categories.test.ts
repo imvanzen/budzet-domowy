@@ -1,11 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { useTestDb } from "@/__tests__/db/helpers";
 import { seedTestDb } from "@/__tests__/db/fixtures";
 import { categories } from "@/db/schema";
 import { eq, asc } from "drizzle-orm";
-
-// We'll test the database operations directly since services use global db import
-// This mirrors the service logic without needing to mock the global import
 
 describe("Categories Service Logic", () => {
   const testDb = useTestDb();

@@ -10,9 +10,7 @@
     "format": "biome format --write",
     "seed": "tsx scripts/seed.ts",
     "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:run": "vitest run"
   },
   "dependencies": {
     "@heroui/react": "2.8.5",
@@ -35,8 +33,6 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "5.1.2",
-    "@vitest/ui": "4.0.15",
-    "babel-plugin-react-compiler": "1.0.0",
     "drizzle-kit": "0.31.8",
     "drizzle-orm": "0.45.1",
     "jsdom": "27.3.0",

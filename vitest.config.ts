@@ -8,19 +8,7 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     setupFiles: ["./src/__tests__/setup.ts"],
-    css: true,
-    exclude: ["**/node_modules/**", "**/e2e/**", "**/.next/**"],
-    coverage: {
-      provider: "v8",
-      reporter: ["text", "json", "html"],
-      exclude: [
-        "node_modules/",
-        "src/__tests__/",
-        "**/*.d.ts",
-        "**/*.config.*",
-        "**/mockData/**",
-      ],
-    },
+    exclude: ["**/node_modules/**", "**/.next/**"],
   },
   resolve: {
     alias: {

@@ -1,5 +1,4 @@
-import { today, getLocalTimeZone, CalendarDate } from "@internationalized/date";
-import type { DateValue } from "@react-types/datepicker";
+import { today, getLocalTimeZone, CalendarDate, type DateValue } from "@internationalized/date";
 import type { RangeValue } from "@react-types/shared";
 
 export type PeriodPreset =

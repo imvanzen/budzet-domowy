@@ -6,7 +6,7 @@ import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
 import { Pagination } from "@heroui/react";
-import type { DateValue } from "@react-types/datepicker";
+import type { DateValue } from "@internationalized/date";
 import type { RangeValue } from "@react-types/shared";
 import { TransactionList } from "./TransactionList";
 import { TransactionFilters } from "./TransactionFilters";

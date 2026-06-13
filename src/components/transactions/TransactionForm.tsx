@@ -11,7 +11,7 @@ import {
   Autocomplete,
   AutocompleteItem,
 } from "@heroui/react";
-import type { DateValue } from "@react-types/datepicker";
+import type { DateValue } from "@internationalized/date";
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { editTransaction } from "@/app/transactions/actions";
 import {

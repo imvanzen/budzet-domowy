@@ -1,7 +1,7 @@
 "use client";
 
 import { Select, SelectItem, DateRangePicker } from "@heroui/react";
-import type { DateValue } from "@react-types/datepicker";
+import type { DateValue } from "@internationalized/date";
 import type { RangeValue } from "@react-types/shared";
 import type { Category, TransactionType } from "@/db/schema";
 import { transactionType } from "@/db/schema";

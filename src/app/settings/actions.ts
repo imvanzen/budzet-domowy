@@ -3,10 +3,9 @@
 import { updateSettings } from "@/services/settings";
 import { revalidatePath } from "next/cache";
 import type { Currency } from "@/db/schema";
+import type { ActionResult } from "@/types/actions";
 
-export type ActionResult =
-  | { success: true }
-  | { success: false; error: string };
+export type { ActionResult };
 
 export async function changeCurrency(currency: Currency): Promise<ActionResult> {
   try {

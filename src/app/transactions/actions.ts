@@ -12,10 +12,9 @@ import {
 } from "@/services/transactions";
 import { revalidatePath } from "next/cache";
 import type { NewTransaction } from "@/db/schema";
+import type { ActionResult } from "@/types/actions";
 
-export type ActionResult =
-  | { success: true; data?: { id: string } }
-  | { success: false; error: string };
+export type { ActionResult };
 
 function validateTransaction(input: {
   amount?: number;
@@ -43,7 +42,7 @@ function validateTransaction(input: {
 
 export async function addTransaction(
   input: Omit<NewTransaction, "id" | "createdAt" | "updatedAt">
-): Promise<ActionResult> {
+): Promise<ActionResult<{ id: string }>> {
   try {
     const error = validateTransaction(input);
     if (error) {

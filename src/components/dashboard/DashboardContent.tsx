@@ -4,9 +4,9 @@ import { useState, useTransition, useEffect } from "react";
 import { Card, CardBody } from "@heroui/card";
 import {
   SelectPeriod,
-  getDateRangeFromPreset,
   type PeriodPreset,
 } from "@/components/shared/SelectPeriod";
+import { getDateRangeFromPreset } from "@/lib/dateRange";
 import { SummaryCards } from "./SummaryCards";
 import { ExpensesPieChart } from "./ExpensesPieChart";
 import { IncomeExpenseBarChart } from "./IncomeExpenseBarChart";

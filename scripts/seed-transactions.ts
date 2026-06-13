@@ -489,16 +489,16 @@ async function main() {
   const rng = createRng(SEED);
   const allTransactions: TransactionDraft[] = [];
 
-  const cursor = new Date(START_DATE);
-  while (cursor <= END_DATE) {
-    const year = cursor.getFullYear();
-    const month = cursor.getMonth();
+  const monthDate = new Date(START_DATE);
+  while (monthDate <= END_DATE) {
+    const year = monthDate.getFullYear();
+    const month = monthDate.getMonth();
     const monthTxs = generateMonthTransactions(year, month, catMap, rng);
     allTransactions.push(...monthTxs);
     console.log(
       `   ${year}-${String(month + 1).padStart(2, "0")}: ${monthTxs.length} transactions`,
     );
-    cursor.setMonth(cursor.getMonth() + 1);
+    monthDate.setMonth(monthDate.getMonth() + 1);
   }
 
   for (let i = 0; i < allTransactions.length; i += BATCH_SIZE) {

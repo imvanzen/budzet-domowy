@@ -1,49 +1,97 @@
-# System Zarządzania Budżetem Domowym
+# Budżet Domowy
 
-Prosty, intuicyjny system do zarządzania budżetem domowym. Aplikacja webowa umożliwiająca rejestrowanie transakcji finansowych, klasyfikowanie ich według kategorii oraz analizę przepływów finansowych w wybranych okresach.
+Aplikacja webowa do zarządzania finansami osobistymi — rejestrowanie przychodów i wydatków, kategoryzacja transakcji oraz analiza bilansu w wybranym okresie.
+
+> Projekt zaliczeniowy z przedmiotu **Systemy Sieciowe** (WSTI).
+
+## Informacje o projekcie
+
+| | |
+|---|---|
+| **Autor** | Jakub Reczko |
+| **Nr albumu** | 09224 |
+| **E-mail** | jakub.reczko@edu.wsti.pl |
+| **Przedmiot** | Systemy Sieciowe |
 
 ## Funkcjonalności
 
-- **Rejestracja transakcji** - wprowadzanie przychodów i wydatków z datą, kwotą, opisem i kategorią
-- **Zarządzanie kategoriami** - tworzenie i edycja kategorii budżetowych
-- **Analiza finansowa** - obliczanie bilansu w wybranych okresach (tygodniowy, miesięczny, roczny)
-- **Wizualizacja danych** - wykresy słupkowe i kołowe prezentujące strukturę wydatków i przychodów
-- **Filtrowanie** - filtrowanie transakcji po dacie, typie i kategorii
-- **Ustawienia** - wybór waluty (PLN/EUR/USD)
+- Rejestracja transakcji (przychody i wydatki) z datą, kwotą, opisem i kategorią
+- Zarządzanie kategoriami budżetowymi
+- Analiza finansowa w wybranym okresie (tygodniowy, miesięczny, roczny)
+- Wizualizacja danych — wykres kołowy struktury wydatków, wykres słupkowy przychodów i wydatków
+- Filtrowanie transakcji po dacie, typie i kategorii
+- Ustawienia — wybór waluty (PLN / EUR / USD)
 
-## Technologie
+## Widoki aplikacji
 
-- Next.js 16 (App Router)
-- React 19
-- TypeScript
-- Drizzle ORM
-- SQLite (lokalna baza danych)
-- Vitest (testy jednostkowe i integracyjne)
+| Widok | Opis |
+|---|---|
+| **Dashboard** | Podsumowanie finansów z wykresami |
+| **Transakcje** | Lista transakcji z filtrowaniem i paginacją |
+| **Kategorie** | Tworzenie i edycja kategorii |
+| **Ustawienia** | Konfiguracja waluty i motywu |
 
-## Instalacja i uruchomienie
+## Stos technologiczny
+
+- **Next.js 16** (App Router) + **React 19** + **TypeScript**
+- **SQLite** + **Drizzle ORM**
+- **HeroUI** + **Tailwind CSS 4**
+- **Recharts** — wykresy
+- **Vitest** + **Testing Library** — testy jednostkowe i integracyjne
+
+## Uruchomienie
+
+**Wymagania:** Node.js 20+, pnpm
 
 ```bash
 # Instalacja zależności
 pnpm install
 
 # Konfiguracja bazy danych
-# Utwórz plik .env.local z: DB_FILE_NAME=file:./local.db
+cp .env.example .env.local
 
-# Inicjalizacja bazy danych
+# Inicjalizacja schematu bazy
 pnpm drizzle-kit push
 
-# Załadowanie danych testowych
+# Dane przykładowe (opcjonalnie)
 pnpm seed
 
-# Uruchomienie serwera deweloperskiego
+# Serwer deweloperski
 pnpm dev
 ```
 
-Aplikacja dostępna pod [http://localhost:3000](http://localhost:3000)
+Aplikacja: [http://localhost:3000](http://localhost:3000)
 
 ## Testy
 
 ```bash
-# Testy jednostkowe i integracyjne
-pnpm test
+pnpm test        # tryb watch
+pnpm test:run    # jednorazowe uruchomienie
+pnpm lint        # Biome — lint i format
 ```
+
+## Struktura projektu
+
+```
+src/
+├── app/                  # Routing (App Router), Server Actions
+│   ├── page.tsx          # Dashboard
+│   ├── transactions/     # Lista, dodawanie, edycja transakcji
+│   ├── categories/       # Zarządzanie kategoriami
+│   └── settings/         # Ustawienia aplikacji
+├── components/           # Komponenty React (UI)
+├── services/             # Logika dostępu do bazy danych
+├── db/                   # Schemat Drizzle, połączenie z SQLite
+├── lib/                  # Funkcje pomocnicze (formatowanie, daty)
+├── types/                # Wspólne typy TypeScript
+└── hooks/                # Hooki React
+scripts/                  # Skrypty seedowania bazy
+```
+
+## Architektura
+
+Warstwy aplikacji:
+
+1. **`app/`** — strony Next.js i Server Actions (walidacja, revalidacja cache)
+2. **`services/`** — operacje na bazie danych (CRUD, agregacje, raporty)
+3. **`components/`** — interfejs użytkownika (Server i Client Components)

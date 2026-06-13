@@ -2,14 +2,9 @@
 
 import { Select, SelectItem } from "@heroui/select";
 import { Input } from "@heroui/input";
+import type { PeriodPreset } from "@/lib/dateRange";
 
-export type PeriodPreset =
-  | "current-month"
-  | "previous-month"
-  | "last-3-months"
-  | "last-6-months"
-  | "last-12-months"
-  | "custom";
+export type { PeriodPreset };
 
 type SelectPeriodProps = {
   preset: PeriodPreset;
@@ -70,46 +65,5 @@ export function SelectPeriod({
       )}
     </div>
   );
-}
-
-export function getDateRangeFromPreset(
-  preset: PeriodPreset,
-  customFrom?: string,
-  customTo?: string
-): { dateFrom: Date; dateTo: Date } {
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-  switch (preset) {
-    case "current-month": {
-      const start = new Date(now.getFullYear(), now.getMonth(), 1);
-      const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-      return { dateFrom: start, dateTo: end };
-    }
-    case "previous-month": {
-      const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-      const end = new Date(now.getFullYear(), now.getMonth(), 0);
-      return { dateFrom: start, dateTo: end };
-    }
-    case "last-3-months": {
-      const start = new Date(now.getFullYear(), now.getMonth() - 2, 1);
-      return { dateFrom: start, dateTo: today };
-    }
-    case "last-6-months": {
-      const start = new Date(now.getFullYear(), now.getMonth() - 5, 1);
-      return { dateFrom: start, dateTo: today };
-    }
-    case "last-12-months": {
-      const start = new Date(now.getFullYear(), now.getMonth() - 11, 1);
-      return { dateFrom: start, dateTo: today };
-    }
-    case "custom": {
-      const from = customFrom ? new Date(customFrom) : today;
-      const to = customTo ? new Date(customTo) : today;
-      return { dateFrom: from, dateTo: to };
-    }
-    default:
-      return { dateFrom: today, dateTo: today };
-  }
 }
 

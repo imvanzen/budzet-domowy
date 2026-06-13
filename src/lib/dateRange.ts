@@ -2,6 +2,55 @@ import { today, getLocalTimeZone } from "@internationalized/date";
 import type { DateValue } from "@react-types/datepicker";
 import type { RangeValue } from "@react-types/shared";
 
+export type PeriodPreset =
+  | "current-month"
+  | "previous-month"
+  | "last-3-months"
+  | "last-6-months"
+  | "last-12-months"
+  | "custom";
+
+export function getDateRangeFromPreset(
+  preset: PeriodPreset,
+  customFrom?: string,
+  customTo?: string,
+): { dateFrom: Date; dateTo: Date } {
+  const now = new Date();
+  const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  switch (preset) {
+    case "current-month": {
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      return { dateFrom: start, dateTo: end };
+    }
+    case "previous-month": {
+      const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const end = new Date(now.getFullYear(), now.getMonth(), 0);
+      return { dateFrom: start, dateTo: end };
+    }
+    case "last-3-months": {
+      const start = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+      return { dateFrom: start, dateTo: todayDate };
+    }
+    case "last-6-months": {
+      const start = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+      return { dateFrom: start, dateTo: todayDate };
+    }
+    case "last-12-months": {
+      const start = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+      return { dateFrom: start, dateTo: todayDate };
+    }
+    case "custom": {
+      const from = customFrom ? new Date(customFrom) : todayDate;
+      const to = customTo ? new Date(customTo) : todayDate;
+      return { dateFrom: from, dateTo: to };
+    }
+    default:
+      return { dateFrom: todayDate, dateTo: todayDate };
+  }
+}
+
 export function validateTransactionDateRange(
   value: RangeValue<DateValue> | null
 ): string | null {

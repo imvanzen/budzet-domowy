@@ -3,14 +3,13 @@
 import { createCategory, updateCategory, deleteCategory } from "@/services/categories";
 import { revalidatePath } from "next/cache";
 import type { NewCategory } from "@/db/schema";
+import type { ActionResult } from "@/types/actions";
 
-export type ActionResult =
-  | { success: true; data?: { id: string } }
-  | { success: false; error: string };
+export type { ActionResult };
 
 export async function addCategory(
   input: Omit<NewCategory, "id" | "createdAt" | "updatedAt">
-): Promise<ActionResult> {
+): Promise<ActionResult<{ id: string }>> {
   try {
     if (!input.name || input.name.trim().length === 0) {
       return { success: false, error: "Nazwa kategorii jest wymagana" };

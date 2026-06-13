@@ -1,26 +1,52 @@
 "use client";
 
-import { Select, SelectItem } from "@heroui/react";
+import { Select, SelectItem, DateRangePicker } from "@heroui/react";
+import type { DateValue } from "@react-types/datepicker";
+import type { RangeValue } from "@react-types/shared";
 import type { Category, TransactionType } from "@/db/schema";
 import { transactionType } from "@/db/schema";
+import {
+  getMaxSelectableDate,
+  validateTransactionDateRange,
+} from "@/lib/dateRange";
 
 type TransactionFiltersProps = {
   categories: Category[];
   selectedType?: TransactionType | "ALL";
   selectedCategoryId?: string | "ALL";
+  dateRange?: RangeValue<DateValue> | null;
   onTypeChange: (type: TransactionType | "ALL") => void;
   onCategoryChange: (categoryId: string | "ALL") => void;
+  onDateRangeChange: (range: RangeValue<DateValue> | null) => void;
 };
 
 export function TransactionFilters({
   categories,
   selectedType = "ALL",
   selectedCategoryId = "ALL",
+  dateRange = null,
   onTypeChange,
   onCategoryChange,
+  onDateRangeChange,
 }: TransactionFiltersProps) {
+  const maxDate = getMaxSelectableDate();
+
+  const handleDateRangeChange = (value: RangeValue<DateValue> | null) => {
+    if (!value?.start || !value?.end) {
+      onDateRangeChange(value);
+      return;
+    }
+
+    const error = validateTransactionDateRange(value);
+    if (error) {
+      return;
+    }
+
+    onDateRangeChange(value);
+  };
+
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
       <Select
         label="Typ transakcji"
         selectedKeys={selectedType ? [selectedType] : []}
@@ -53,8 +79,19 @@ export function TransactionFilters({
           </SelectItem>
         ))}
       </Select>
+
+      <DateRangePicker
+        label="Zakres dat"
+        value={dateRange}
+        onChange={handleDateRangeChange}
+        maxValue={maxDate}
+        validate={(value) => {
+          const error = validateTransactionDateRange(value);
+          return error ?? true;
+        }}
+        validationBehavior="aria"
+        aria-label="Zakres dat"
+      />
     </div>
   );
 }
-
-

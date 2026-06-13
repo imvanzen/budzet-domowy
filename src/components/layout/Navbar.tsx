@@ -7,7 +7,10 @@ import { usePathname } from "next/navigation";
 export function Navbar() {
   const pathname = usePathname();
 
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) =>
+    path === "/"
+      ? pathname === path
+      : pathname === path || pathname.startsWith(`${path}/`);
 
   return (
     <HeroNavbar isBordered>

@@ -2,139 +2,147 @@
 
 import { useState, useTransition, useEffect } from "react";
 import { Card, CardBody, CardHeader } from "@heroui/card";
-import { TransactionForm } from "./TransactionForm";
+import { Button } from "@heroui/button";
+import { Link } from "@heroui/link";
+import { Pagination } from "@heroui/react";
+import type { DateValue } from "@react-types/datepicker";
+import type { RangeValue } from "@react-types/shared";
 import { TransactionList } from "./TransactionList";
 import { TransactionFilters } from "./TransactionFilters";
-import type { Transaction, Category, TransactionType, Currency } from "@/db/schema";
+import type { Category, TransactionType, Currency } from "@/db/schema";
 import { Chip } from "@heroui/react";
 import { getFilteredTransactions } from "@/app/transactions/actions";
+import type { PaginatedResult, TransactionWithCategory } from "@/services/transactions";
+import {
+  calendarDateRangeToDates,
+  validateTransactionDateRange,
+} from "@/lib/dateRange";
 
 type TransactionsManagerProps = {
-  initialTransactions: Array<
-    Transaction & { category: { name: string } | null }
-  >;
+  initialData: PaginatedResult<TransactionWithCategory>;
   categories: Category[];
   currency: Currency;
 };
 
 export function TransactionsManager({
-  initialTransactions,
+  initialData,
   categories,
   currency,
 }: TransactionsManagerProps) {
-  const [editingTransaction, setEditingTransaction] =
-    useState<Transaction | null>(null);
-  const [transactions, setTransactions] = useState(initialTransactions);
+  const [data, setData] = useState(initialData);
+  const [page, setPage] = useState(initialData.page);
   const [selectedType, setSelectedType] = useState<TransactionType | "ALL">("ALL");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | "ALL">("ALL");
+  const [dateRange, setDateRange] = useState<RangeValue<DateValue> | null>(null);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     const fetchFilteredTransactions = () => {
       startTransition(async () => {
-        const filters: { type?: TransactionType; categoryId?: string } = {};
-        
+        const filters: {
+          type?: TransactionType;
+          categoryId?: string;
+          dateFrom?: Date;
+          dateTo?: Date;
+        } = {};
+
         if (selectedType !== "ALL") {
           filters.type = selectedType;
         }
-        
+
         if (selectedCategoryId !== "ALL") {
           filters.categoryId = selectedCategoryId;
         }
 
-        const filtered = await getFilteredTransactions(
-          Object.keys(filters).length > 0 ? filters : undefined
+        if (
+          dateRange?.start &&
+          dateRange?.end &&
+          !validateTransactionDateRange(dateRange)
+        ) {
+          const { dateFrom, dateTo } = calendarDateRangeToDates(dateRange);
+          filters.dateFrom = dateFrom;
+          filters.dateTo = dateTo;
+        }
+
+        const result = await getFilteredTransactions(
+          Object.keys(filters).length > 0 ? filters : undefined,
+          page
         );
-        
-        setTransactions(filtered);
+
+        setData(result);
       });
     };
 
     fetchFilteredTransactions();
-  }, [selectedType, selectedCategoryId]);
+  }, [selectedType, selectedCategoryId, dateRange, page]);
 
-  const handleEdit = (transaction: Transaction) => {
-    setEditingTransaction(transaction);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  const handleTypeChange = (type: TransactionType | "ALL") => {
+    setSelectedType(type);
+    setPage(1);
   };
 
-  const handleSuccess = () => {
-    setEditingTransaction(null);
-    // Refresh transactions after adding/editing
-    startTransition(async () => {
-      const filters: { type?: TransactionType; categoryId?: string } = {};
-      
-      if (selectedType !== "ALL") {
-        filters.type = selectedType;
-      }
-      
-      if (selectedCategoryId !== "ALL") {
-        filters.categoryId = selectedCategoryId;
-      }
-
-      const filtered = await getFilteredTransactions(
-        Object.keys(filters).length > 0 ? filters : undefined
-      );
-      
-      setTransactions(filtered);
-    });
+  const handleCategoryChange = (categoryId: string | "ALL") => {
+    setSelectedCategoryId(categoryId);
+    setPage(1);
   };
 
-  const handleCancel = () => {
-    setEditingTransaction(null);
+  const handleDateRangeChange = (range: RangeValue<DateValue> | null) => {
+    setDateRange(range);
+    setPage(1);
   };
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-      <Card className="lg:col-span-1">
-        <CardHeader>
-          <h2 className="text-xl font-semibold">
-            {editingTransaction ? "Edytuj transakcję" : "Dodaj transakcję"}
-          </h2>
-        </CardHeader>
-        <CardBody>
-          <TransactionForm
-            categories={categories}
-            transaction={editingTransaction || undefined}
-            onSuccess={handleSuccess}
-            onCancel={editingTransaction ? handleCancel : undefined}
-          />
-        </CardBody>
-      </Card>
-
-      <Card className="lg:col-span-2">
-        <CardHeader>
-          <div className="flex items-center justify-between">
+    <Card>
+      <CardHeader>
+        <div className="flex w-full items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
             <h2 className="text-xl font-semibold">Lista transakcji</h2>
             <Chip color="primary" size="sm" variant="solid">
-              {transactions.length}
+              {data.total}
             </Chip>
           </div>
-        </CardHeader>
-        <CardBody>
-          <div className="space-y-4">
-            <TransactionFilters
-              categories={categories}
-              selectedType={selectedType}
-              selectedCategoryId={selectedCategoryId}
-              onTypeChange={setSelectedType}
-              onCategoryChange={setSelectedCategoryId}
+          <Link href="/transactions/new">
+            <Button color="primary">Dodaj transakcję</Button>
+          </Link>
+        </div>
+      </CardHeader>
+      <CardBody>
+        <div className="space-y-4">
+          <TransactionFilters
+            categories={categories}
+            selectedType={selectedType}
+            selectedCategoryId={selectedCategoryId}
+            dateRange={dateRange}
+            onTypeChange={handleTypeChange}
+            onCategoryChange={handleCategoryChange}
+            onDateRangeChange={handleDateRangeChange}
+          />
+
+          {isPending && (
+            <div className="text-center text-default-500">Ładowanie...</div>
+          )}
+
+          <div className={isPending ? "opacity-50" : ""}>
+            <TransactionList
+              transactions={data.items}
+              currency={currency}
             />
-            
-            {isPending && (
-              <div className="text-center text-default-500">Ładowanie...</div>
-            )}
-            
-            <div className={isPending ? "opacity-50" : ""}>
-              <TransactionList
-                transactions={transactions}
-                onEdit={handleEdit}
-                currency={currency}
+          </div>
+
+          {data.totalPages > 1 && (
+            <div className="flex justify-center pt-2">
+              <Pagination
+                total={data.totalPages}
+                page={page}
+                onChange={setPage}
+                showControls
+                color="primary"
+                aria-label="Paginacja transakcji"
               />
             </div>
-          </div>
-        </CardBody>
-      </Card>
-    </div>
+          )}
+        </div>
+      </CardBody>
+    </Card>
   );
 }

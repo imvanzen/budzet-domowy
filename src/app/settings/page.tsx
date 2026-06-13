@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 import { getSettings } from "@/services/settings";
 import { Card, CardBody, CardHeader } from "@heroui/card";
-import { SettingsForm } from "@/components/settings/SettingsForm";
+import { CurrencySelector } from "@/components/settings/CurrencySelector";
+import { ThemeSelector } from "@/components/settings/ThemeSelector";
 
 async function SettingsContent() {
   const settings = await getSettings();
@@ -14,10 +15,19 @@ async function SettingsContent() {
 
       <Card>
         <CardHeader>
+          <h2 className="text-xl font-semibold">Wygląd</h2>
+        </CardHeader>
+        <CardBody>
+          <ThemeSelector />
+        </CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <h2 className="text-xl font-semibold">Waluta domyślna</h2>
         </CardHeader>
         <CardBody>
-          <SettingsForm initialCurrency={settings.currency} />
+          <CurrencySelector initialCurrency={settings.currency} />
         </CardBody>
       </Card>
     </div>

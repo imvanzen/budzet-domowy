@@ -1,8 +1,17 @@
 "use server";
 
-import { createTransaction, updateTransaction, deleteTransaction, getTransactions, type TransactionFilters } from "@/services/transactions";
+import {
+  createTransaction,
+  updateTransaction,
+  deleteTransaction,
+  getPaginatedTransactions,
+  DEFAULT_PAGE_SIZE,
+  type PaginatedResult,
+  type TransactionFilters,
+  type TransactionWithCategory,
+} from "@/services/transactions";
 import { revalidatePath } from "next/cache";
-import type { NewTransaction, Transaction } from "@/db/schema";
+import type { NewTransaction } from "@/db/schema";
 
 export type ActionResult =
   | { success: true; data?: { id: string } }
@@ -43,6 +52,8 @@ export async function addTransaction(
 
     const transaction = await createTransaction(input);
     revalidatePath("/transactions");
+    revalidatePath("/transactions/new");
+    revalidatePath(`/transactions/${transaction.id}/edit`);
     revalidatePath("/");
 
     return { success: true, data: { id: transaction.id } };
@@ -67,6 +78,8 @@ export async function editTransaction(
 
     await updateTransaction(id, input);
     revalidatePath("/transactions");
+    revalidatePath("/transactions/new");
+    revalidatePath(`/transactions/${id}/edit`);
     revalidatePath("/");
 
     return { success: true };
@@ -83,6 +96,8 @@ export async function removeTransaction(id: string): Promise<ActionResult> {
   try {
     await deleteTransaction(id);
     revalidatePath("/transactions");
+    revalidatePath("/transactions/new");
+    revalidatePath(`/transactions/${id}/edit`);
     revalidatePath("/");
 
     return { success: true };
@@ -96,7 +111,9 @@ export async function removeTransaction(id: string): Promise<ActionResult> {
 }
 
 export async function getFilteredTransactions(
-  filters?: TransactionFilters
-): Promise<Array<Transaction & { category: { name: string } | null }>> {
-  return getTransactions(filters);
+  filters?: TransactionFilters,
+  page = 1,
+  pageSize = DEFAULT_PAGE_SIZE
+): Promise<PaginatedResult<TransactionWithCategory>> {
+  return getPaginatedTransactions(filters, page, pageSize);
 }

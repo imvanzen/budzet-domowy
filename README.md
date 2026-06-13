@@ -47,7 +47,3 @@ Aplikacja dostępna pod [http://localhost:3000](http://localhost:3000)
 # Testy jednostkowe i integracyjne
 pnpm test
 ```
-
-## Dokumentacja
-
-Szczegółowa dokumentacja projektu dostępna w pliku `docs/Jakub_Reczko_5ION1_Projekt_Zarzadzania_Budżetem_Domowym.pdf`

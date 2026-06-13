@@ -1,16 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@/__tests__/test-utils";
-import userEvent from "@testing-library/user-event";
 import { TransactionsManager } from "../TransactionsManager";
 import { transactionType } from "@/db/schema";
-import type { Transaction, Category } from "@/db/schema";
+import type { Category } from "@/db/schema";
+import type { PaginatedResult, TransactionWithCategory } from "@/services/transactions";
 
-// Mock the server actions
 vi.mock("@/app/transactions/actions", () => ({
   getFilteredTransactions: vi.fn(),
 }));
 
-// Mock next/navigation
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: vi.fn(),
@@ -36,9 +34,7 @@ describe("TransactionsManager", () => {
     },
   ];
 
-  const mockTransactions: Array<
-    Transaction & { category: { name: string } | null }
-  > = [
+  const mockTransactions: TransactionWithCategory[] = [
     {
       id: "trans-1",
       amount: 100.5,
@@ -74,41 +70,55 @@ describe("TransactionsManager", () => {
     },
   ];
 
+  const mockInitialData: PaginatedResult<TransactionWithCategory> = {
+    items: mockTransactions,
+    total: 3,
+    page: 1,
+    pageSize: 10,
+    totalPages: 1,
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(getFilteredTransactions).mockResolvedValue(mockTransactions);
+    vi.mocked(getFilteredTransactions).mockResolvedValue(mockInitialData);
   });
 
   describe("rendering", () => {
-    it("should render transaction form and list", () => {
+    it("should render transaction list and add button", () => {
       render(
         <TransactionsManager
-          initialTransactions={mockTransactions}
+          initialData={mockInitialData}
           categories={mockCategories}
+          currency="PLN"
         />
       );
 
-      expect(screen.getAllByText("Dodaj transakcję")[0]).toBeInTheDocument();
       expect(screen.getByText("Lista transakcji")).toBeInTheDocument();
+      expect(
+        screen.getByRole("link", { name: /dodaj transakcję/i })
+      ).toHaveAttribute("href", "/transactions/new");
     });
 
     it("should render filters", () => {
       render(
         <TransactionsManager
-          initialTransactions={mockTransactions}
+          initialData={mockInitialData}
           categories={mockCategories}
+          currency="PLN"
         />
       );
 
       expect(screen.getAllByLabelText("Typ transakcji")[0]).toBeInTheDocument();
       expect(screen.getAllByLabelText("Kategoria")[0]).toBeInTheDocument();
+      expect(screen.getAllByLabelText("Zakres dat")[0]).toBeInTheDocument();
     });
 
-    it("should display transaction count", () => {
+    it("should display total transaction count", () => {
       render(
         <TransactionsManager
-          initialTransactions={mockTransactions}
+          initialData={mockInitialData}
           categories={mockCategories}
+          currency="PLN"
         />
       );
 
@@ -120,8 +130,9 @@ describe("TransactionsManager", () => {
     it("should call getFilteredTransactions on mount", async () => {
       render(
         <TransactionsManager
-          initialTransactions={mockTransactions}
+          initialData={mockInitialData}
           categories={mockCategories}
+          currency="PLN"
         />
       );
 
@@ -131,13 +142,20 @@ describe("TransactionsManager", () => {
     });
 
     it("should update transactions when filters change", async () => {
-      const filteredTransactions = [mockTransactions[0]!];
-      vi.mocked(getFilteredTransactions).mockResolvedValue(filteredTransactions);
+      const filteredData: PaginatedResult<TransactionWithCategory> = {
+        items: [mockTransactions[0]!],
+        total: 1,
+        page: 1,
+        pageSize: 10,
+        totalPages: 1,
+      };
+      vi.mocked(getFilteredTransactions).mockResolvedValue(filteredData);
 
       const { rerender } = render(
         <TransactionsManager
-          initialTransactions={mockTransactions}
+          initialData={mockInitialData}
           categories={mockCategories}
+          currency="PLN"
         />
       );
 
@@ -145,13 +163,11 @@ describe("TransactionsManager", () => {
         expect(getFilteredTransactions).toHaveBeenCalled();
       });
 
-      // Simulate filter change by rerendering with different initial state
-      vi.mocked(getFilteredTransactions).mockResolvedValue(filteredTransactions);
-      
       rerender(
         <TransactionsManager
-          initialTransactions={filteredTransactions}
+          initialData={filteredData}
           categories={mockCategories}
+          currency="PLN"
         />
       );
 
@@ -159,22 +175,43 @@ describe("TransactionsManager", () => {
         expect(screen.getByText("1")).toBeInTheDocument();
       });
     });
+  });
 
-    it("should display filtered transaction count", async () => {
-      const filteredTransactions = [mockTransactions[0]!];
-      vi.mocked(getFilteredTransactions).mockResolvedValue(filteredTransactions);
+  describe("pagination", () => {
+    it("should render pagination when there are multiple pages", () => {
+      const paginatedData: PaginatedResult<TransactionWithCategory> = {
+        items: mockTransactions,
+        total: 25,
+        page: 1,
+        pageSize: 10,
+        totalPages: 3,
+      };
 
       render(
         <TransactionsManager
-          initialTransactions={mockTransactions}
+          initialData={paginatedData}
           categories={mockCategories}
+          currency="PLN"
         />
       );
 
-      await waitFor(() => {
-        expect(getFilteredTransactions).toHaveBeenCalled();
-      });
+      expect(
+        screen.getByRole("navigation", { name: /paginacja transakcji/i })
+      ).toBeInTheDocument();
+    });
+
+    it("should not render pagination for a single page", () => {
+      render(
+        <TransactionsManager
+          initialData={mockInitialData}
+          categories={mockCategories}
+          currency="PLN"
+        />
+      );
+
+      expect(
+        screen.queryByRole("navigation", { name: /paginacja transakcji/i })
+      ).not.toBeInTheDocument();
     });
   });
 });
-

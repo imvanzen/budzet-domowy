@@ -9,11 +9,13 @@
     "lint": "biome check",
     "format": "biome format --write",
     "seed": "tsx scripts/seed.ts",
+    "seed:transactions": "tsx scripts/seed-transactions.ts",
     "test": "vitest",
     "test:run": "vitest run"
   },
   "dependencies": {
     "@heroui/react": "2.8.5",
+    "@internationalized/date": "^3.12.2",
     "@libsql/client": "0.15.15",
     "dotenv": "17.2.3",
     "framer-motion": "12.23.26",

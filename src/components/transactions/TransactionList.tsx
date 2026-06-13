@@ -2,21 +2,21 @@
 
 import { useState } from "react";
 import { Button } from "@heroui/button";
+import { Link } from "@heroui/link";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { transactionType } from "@/db/schema";
 import type { Transaction, Currency } from "@/db/schema";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
 import { removeTransaction } from "@/app/transactions/actions";
+import type { TransactionWithCategory } from "@/services/transactions";
 
 interface TransactionListProps {
-  transactions: Array<Transaction & { category: { name: string } | null }>;
-  onEdit?: (transaction: Transaction) => void;
+  transactions: TransactionWithCategory[];
   currency: Currency;
 }
 
 export function TransactionList({
   transactions,
-  onEdit,
   currency,
 }: TransactionListProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -41,7 +41,7 @@ export function TransactionList({
 
   return (
     <>
-      <div className="space-y-2 max-h-[calc(100vh-30rem)] overflow-y-auto">
+      <div className="space-y-2">
         {transactions.map((transaction) => (
           <div
             key={transaction.id}
@@ -88,15 +88,11 @@ export function TransactionList({
                 {transaction.type === transactionType.INCOME ? "+" : "-"}
                 {formatCurrency(transaction.amount, currency)}
               </p>
-              {onEdit && (
-                <Button
-                  size="sm"
-                  variant="light"
-                  onPress={() => onEdit(transaction)}
-                >
+              <Link href={`/transactions/${transaction.id}/edit`}>
+                <Button size="sm" variant="light">
                   Edytuj
                 </Button>
-              )}
+              </Link>
               <Button
                 size="sm"
                 color="danger"

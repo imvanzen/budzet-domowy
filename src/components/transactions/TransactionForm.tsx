@@ -214,7 +214,7 @@ export function TransactionForm({
       )}
 
       <div className="flex gap-2">
-        {isEditMode && onCancel && (
+        {onCancel && (
           <Button variant="light" onPress={onCancel} className="flex-1">
             Anuluj
           </Button>
@@ -223,7 +223,7 @@ export function TransactionForm({
           type="submit"
           color="primary"
           isLoading={isPending}
-          className={isEditMode ? "flex-1" : "w-full"}
+          className={onCancel ? "flex-1" : "w-full"}
         >
           {isPending
             ? isEditMode

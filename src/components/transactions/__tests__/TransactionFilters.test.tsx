@@ -35,13 +35,14 @@ describe("TransactionFilters", () => {
 
   const mockOnTypeChange = vi.fn();
   const mockOnCategoryChange = vi.fn();
+  const mockOnDateRangeChange = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   describe("rendering", () => {
-    it("should render type and category filters", () => {
+    it("should render type, category and date range filters", () => {
       render(
         <TransactionFilters
           categories={mockCategories}
@@ -49,11 +50,13 @@ describe("TransactionFilters", () => {
           selectedCategoryId="ALL"
           onTypeChange={mockOnTypeChange}
           onCategoryChange={mockOnCategoryChange}
+          onDateRangeChange={mockOnDateRangeChange}
         />
       );
 
       expect(screen.getAllByLabelText("Typ transakcji")[0]).toBeInTheDocument();
       expect(screen.getAllByLabelText("Kategoria")[0]).toBeInTheDocument();
+      expect(screen.getAllByLabelText("Zakres dat")[0]).toBeInTheDocument();
     });
 
     it("should display all category options", () => {
@@ -64,6 +67,7 @@ describe("TransactionFilters", () => {
           selectedCategoryId="ALL"
           onTypeChange={mockOnTypeChange}
           onCategoryChange={mockOnCategoryChange}
+          onDateRangeChange={mockOnDateRangeChange}
         />
       );
 
@@ -79,6 +83,7 @@ describe("TransactionFilters", () => {
           selectedCategoryId="ALL"
           onTypeChange={mockOnTypeChange}
           onCategoryChange={mockOnCategoryChange}
+          onDateRangeChange={mockOnDateRangeChange}
         />
       );
 
@@ -93,6 +98,7 @@ describe("TransactionFilters", () => {
           selectedCategoryId="cat-1"
           onTypeChange={mockOnTypeChange}
           onCategoryChange={mockOnCategoryChange}
+          onDateRangeChange={mockOnDateRangeChange}
         />
       );
 
@@ -109,12 +115,13 @@ describe("TransactionFilters", () => {
           selectedCategoryId="cat-1"
           onTypeChange={mockOnTypeChange}
           onCategoryChange={mockOnCategoryChange}
+          onDateRangeChange={mockOnDateRangeChange}
         />
       );
 
-      // Component should render with selected values
       expect(screen.getAllByLabelText("Typ transakcji")[0]).toBeInTheDocument();
       expect(screen.getAllByLabelText("Kategoria")[0]).toBeInTheDocument();
+      expect(screen.getAllByLabelText("Zakres dat")[0]).toBeInTheDocument();
     });
 
     it("should render all categories in the list", () => {
@@ -125,12 +132,11 @@ describe("TransactionFilters", () => {
           selectedCategoryId="ALL"
           onTypeChange={mockOnTypeChange}
           onCategoryChange={mockOnCategoryChange}
+          onDateRangeChange={mockOnDateRangeChange}
         />
       );
 
-      // Verify component renders with all categories
       expect(screen.getAllByLabelText("Kategoria")[0]).toBeInTheDocument();
     });
   });
 });
-

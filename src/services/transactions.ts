@@ -1,7 +1,21 @@
 import db from "@/db";
 import { transactions } from "@/db/schema";
-import { desc, eq, and, gte, lte } from "drizzle-orm";
+import { desc, eq, and, gte, lte, count } from "drizzle-orm";
 import type { NewTransaction, Transaction, TransactionType } from "@/db/schema";
+
+export const DEFAULT_PAGE_SIZE = 10;
+
+export type PaginatedResult<T> = {
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+};
+
+export type TransactionWithCategory = Transaction & {
+  category: { name: string } | null;
+};
 
 export async function createTransaction(
   input: Omit<NewTransaction, "id" | "createdAt" | "updatedAt">
@@ -50,9 +64,7 @@ export type TransactionFilters = {
   categoryId?: string;
 };
 
-export async function getTransactions(
-  filters?: TransactionFilters
-): Promise<Array<Transaction & { category: { name: string } | null }>> {
+function buildTransactionConditions(filters?: TransactionFilters) {
   const conditions = [];
 
   if (filters?.dateFrom) {
@@ -68,18 +80,67 @@ export async function getTransactions(
     conditions.push(eq(transactions.categoryId, filters.categoryId));
   }
 
+  return conditions.length > 0 ? and(...conditions) : undefined;
+}
+
+function mapTransactionWithCategory(
+  t: Transaction & { category: { name: string } | null }
+): TransactionWithCategory {
+  return {
+    ...t,
+    category: t.category ? { name: t.category.name } : null,
+  };
+}
+
+export async function getTransactions(
+  filters?: TransactionFilters
+): Promise<TransactionWithCategory[]> {
   const result = await db.query.transactions.findMany({
-    where: conditions.length > 0 ? and(...conditions) : undefined,
+    where: buildTransactionConditions(filters),
     orderBy: [desc(transactions.date)],
     with: {
       category: true,
     },
   });
 
-  return result.map((t) => ({
-    ...t,
-    category: t.category ? { name: t.category.name } : null,
-  }));
+  return result.map(mapTransactionWithCategory);
+}
+
+export async function getPaginatedTransactions(
+  filters?: TransactionFilters,
+  page = 1,
+  pageSize = DEFAULT_PAGE_SIZE
+): Promise<PaginatedResult<TransactionWithCategory>> {
+  const whereClause = buildTransactionConditions(filters);
+  const safePage = Math.max(1, page);
+
+  const [totalResult] = await db
+    .select({ count: count() })
+    .from(transactions)
+    .where(whereClause);
+
+  const total = totalResult?.count ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const currentPage = Math.min(safePage, totalPages);
+  const offset = (currentPage - 1) * pageSize;
+
+  const result = await db.query.transactions.findMany({
+    where: whereClause,
+    orderBy: [desc(transactions.date)],
+    limit: pageSize,
+    offset,
+    with: {
+      category: true,
+    },
+  });
+
+  return {
+    items: result.map(mapTransactionWithCategory),
+    total,
+    page: currentPage,
+    pageSize,
+    totalPages,
+  };
 }
 
 export type SummaryData = {

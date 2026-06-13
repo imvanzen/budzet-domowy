@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
@@ -11,12 +12,19 @@ import { TransactionList } from "./TransactionList";
 import { TransactionFilters } from "./TransactionFilters";
 import type { Category, TransactionType, Currency } from "@/db/schema";
 import { Chip } from "@heroui/react";
-import { getFilteredTransactions } from "@/app/transactions/actions";
+import {
+  addTransaction,
+  getFilteredTransactions,
+} from "@/app/transactions/actions";
 import type { PaginatedResult, TransactionWithCategory } from "@/services/transactions";
 import {
   calendarDateRangeToDates,
   validateTransactionDateRange,
 } from "@/lib/dateRange";
+import {
+  consumePendingTransaction,
+} from "@/lib/pending-transaction";
+import { showSyncToast } from "@/lib/sync-toast";
 
 type TransactionsManagerProps = {
   initialData: PaginatedResult<TransactionWithCategory>;
@@ -29,12 +37,84 @@ export function TransactionsManager({
   categories,
   currency,
 }: TransactionsManagerProps) {
+  const router = useRouter();
   const [data, setData] = useState(initialData);
   const [page, setPage] = useState(initialData.page);
   const [selectedType, setSelectedType] = useState<TransactionType | "ALL">("ALL");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | "ALL">("ALL");
   const [dateRange, setDateRange] = useState<RangeValue<DateValue> | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
+  const pendingSyncStarted = useRef(false);
+
+  useEffect(() => {
+    const pending = consumePendingTransaction();
+    if (!pending || pendingSyncStarted.current) return;
+
+    pendingSyncStarted.current = true;
+
+    const optimisticTransaction: TransactionWithCategory = {
+      id: pending.tempId,
+      amount: pending.amount,
+      type: pending.type,
+      date: new Date(pending.date),
+      categoryId: pending.categoryId,
+      description: pending.description,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      category: pending.categoryName ? { name: pending.categoryName } : null,
+    };
+
+    setPendingIds((prev) => new Set(prev).add(pending.tempId));
+    setData((prev) => ({
+      ...prev,
+      items: [optimisticTransaction, ...prev.items],
+      total: prev.total + 1,
+    }));
+
+    startTransition(async () => {
+      try {
+        await showSyncToast(
+          async () => {
+            const result = await addTransaction({
+              amount: pending.amount,
+              type: pending.type,
+              date: new Date(pending.date),
+              categoryId: pending.categoryId,
+              description: pending.description,
+            });
+
+            if (!result.success) {
+              throw new Error(result.error);
+            }
+
+            const refreshed = await getFilteredTransactions(undefined, 1);
+            setData(refreshed);
+            setPage(1);
+            router.refresh();
+            return result;
+          },
+          {
+            loading: "Zapisywanie transakcji...",
+            success: "Transakcja została dodana",
+            error: "Nie udało się dodać transakcji",
+          },
+        );
+      } catch {
+        setData((prev) => ({
+          ...prev,
+          items: prev.items.filter((item) => item.id !== pending.tempId),
+          total: Math.max(0, prev.total - 1),
+        }));
+      } finally {
+        setPendingIds((prev) => {
+          const next = new Set(prev);
+          next.delete(pending.tempId);
+          return next;
+        });
+      }
+    });
+  }, [router]);
 
   useEffect(() => {
     const fetchFilteredTransactions = () => {
@@ -126,6 +206,7 @@ export function TransactionsManager({
             <TransactionList
               transactions={data.items}
               currency={currency}
+              pendingIds={pendingIds}
             />
           </div>
 

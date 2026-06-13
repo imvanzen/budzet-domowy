@@ -1,131 +1,148 @@
 "use client";
 
 import { useState, useTransition, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
-import { Textarea } from "@heroui/react";
-import { addTransaction, editTransaction } from "@/app/transactions/actions";
+import {
+  Textarea,
+  DatePicker,
+  Autocomplete,
+  AutocompleteItem,
+} from "@heroui/react";
+import type { DateValue } from "@react-types/datepicker";
+import { today, getLocalTimeZone } from "@internationalized/date";
+import { editTransaction } from "@/app/transactions/actions";
+import {
+  calendarDateToDate,
+  dateToCalendarDate,
+  getMaxSelectableDate,
+} from "@/lib/dateRange";
+import { setPendingTransaction } from "@/lib/pending-transaction";
+import { showSyncToast } from "@/lib/sync-toast";
 import type { Category, Transaction } from "@/db/schema";
 
 interface TransactionFormProps {
   categories: Category[];
   transaction?: Transaction;
-  onSuccess?: () => void;
   onCancel?: () => void;
 }
+
+type FieldErrors = {
+  amount?: string;
+  type?: string;
+  date?: string;
+  description?: string;
+};
 
 export function TransactionForm({
   categories,
   transaction,
-  onSuccess,
   onCancel,
 }: TransactionFormProps) {
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const router = useRouter();
+  const [, startTransition] = useTransition();
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const isEditMode = !!transaction;
 
-  const [formData, setFormData] = useState<{
-    amount: string;
-    type: "INCOME" | "EXPENSE" | "";
-    date: string;
-    categoryId: string;
-    description: string;
-  }>({
-    amount: "",
-    type: "",
-    date: new Date().toISOString().split("T")[0],
-    categoryId: "",
-    description: "",
-  });
+  const [amount, setAmount] = useState("");
+  const [type, setType] = useState<"INCOME" | "EXPENSE" | "">("");
+  const [dateValue, setDateValue] = useState<DateValue>(() =>
+    today(getLocalTimeZone()),
+  );
+  const [categoryId, setCategoryId] = useState<string>("");
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     if (transaction) {
-      setFormData({
-        amount: transaction.amount.toString(),
-        type: transaction.type as "INCOME" | "EXPENSE",
-        date: new Date(transaction.date).toISOString().split("T")[0],
-        categoryId: transaction.categoryId || "",
-        description: transaction.description || "",
-      });
+      setAmount(transaction.amount.toString());
+      setType(transaction.type as "INCOME" | "EXPENSE");
+      setDateValue(dateToCalendarDate(new Date(transaction.date)));
+      setCategoryId(transaction.categoryId || "");
+      setDescription(transaction.description || "");
     }
   }, [transaction]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const validate = (): FieldErrors => {
+    const errors: FieldErrors = {};
+    const parsedAmount = parseFloat(amount);
+
+    if (!parsedAmount || parsedAmount <= 0) {
+      errors.amount = "Kwota musi być większa od 0";
+    }
+
+    if (!type || (type !== "INCOME" && type !== "EXPENSE")) {
+      errors.type = "Wybierz typ transakcji";
+    }
+
+    const maxDate = getMaxSelectableDate();
+    if (dateValue.compare(maxDate) > 0) {
+      errors.date = "Data nie może być z przyszłości";
+    }
+
+    if (description.length > 500) {
+      errors.description = "Opis nie może przekraczać 500 znaków";
+    }
+
+    return errors;
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(false);
 
-    // Client-side validation
-    const amount = parseFloat(formData.amount);
-    if (!amount || amount <= 0) {
-      setError("Kwota musi być większa od 0");
+    const errors = validate();
+    setFieldErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
       return;
     }
 
-    const selectedDate = new Date(formData.date);
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
+    const parsedAmount = parseFloat(amount);
+    const selectedDate = calendarDateToDate(dateValue);
+    const transactionType = type as "INCOME" | "EXPENSE";
+    const selectedCategory = categories.find((c) => c.id === categoryId);
 
-    if (selectedDate > today) {
-      setError("Data nie może być z przyszłości");
+    if (isEditMode) {
+      startTransition(async () => {
+        await showSyncToast(
+          async () => {
+            const result = await editTransaction(transaction.id, {
+              amount: parsedAmount,
+              type: transactionType,
+              date: selectedDate,
+              categoryId: categoryId || null,
+              description: description || null,
+            });
+
+            if (!result.success) {
+              throw new Error(result.error);
+            }
+
+            router.push("/transactions");
+            return result;
+          },
+          {
+            loading: "Zapisywanie transakcji...",
+            success: "Transakcja została zaktualizowana",
+            error: "Nie udało się zapisać transakcji",
+          },
+        );
+      });
       return;
     }
 
-    if (
-      !formData.type ||
-      (formData.type !== "INCOME" && formData.type !== "EXPENSE")
-    ) {
-      setError("Wybierz typ transakcji");
-      return;
-    }
-
-    if (formData.description && formData.description.length > 500) {
-      setError("Opis nie może przekraczać 500 znaków");
-      return;
-    }
-
-    const transactionType: "INCOME" | "EXPENSE" = formData.type;
-
-    startTransition(async () => {
-      const result = isEditMode
-        ? await editTransaction(transaction.id, {
-            amount,
-            type: transactionType,
-            date: selectedDate,
-            categoryId: formData.categoryId || null,
-            description: formData.description || null,
-          })
-        : await addTransaction({
-            amount,
-            type: transactionType,
-            date: selectedDate,
-            categoryId: formData.categoryId || null,
-            description: formData.description || null,
-          });
-
-      if (result.success) {
-        setSuccess(true);
-        if (!isEditMode) {
-          // Reset form only for add mode
-          setFormData({
-            amount: "",
-            type: "",
-            date: new Date().toISOString().split("T")[0],
-            categoryId: "",
-            description: "",
-          });
-        }
-        // Call onSuccess callback if provided
-        setTimeout(() => {
-          setSuccess(false);
-          onSuccess?.();
-        }, 1500);
-      } else {
-        setError(result.error);
-      }
+    setPendingTransaction({
+      tempId: `pending-${crypto.randomUUID()}`,
+      amount: parsedAmount,
+      type: transactionType,
+      date: selectedDate.toISOString(),
+      categoryId: categoryId || null,
+      categoryName: selectedCategory?.name ?? null,
+      description: description || null,
     });
+
+    router.push("/transactions");
   };
 
   return (
@@ -135,25 +152,27 @@ export function TransactionForm({
           label="Kwota"
           type="number"
           step="0.01"
-          value={formData.amount}
-          onValueChange={(value) =>
-            setFormData((prev) => ({ ...prev, amount: value }))
-          }
+          value={amount}
+          onValueChange={(value) => {
+            setAmount(value);
+            setFieldErrors((prev) => ({ ...prev, amount: undefined }));
+          }}
           placeholder="0.00"
-          description="Kwota musi być większa od 0"
+          isInvalid={!!fieldErrors.amount}
+          errorMessage={fieldErrors.amount}
         />
 
         <Select
           label="Typ"
-          selectedKeys={formData.type ? [formData.type] : []}
+          selectedKeys={type ? [type] : []}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0] as string;
-            setFormData((prev) => ({
-              ...prev,
-              type: (selected as "INCOME" | "EXPENSE") || "",
-            }));
+            setType((selected as "INCOME" | "EXPENSE") || "");
+            setFieldErrors((prev) => ({ ...prev, type: undefined }));
           }}
           placeholder="Wybierz typ"
+          isInvalid={!!fieldErrors.type}
+          errorMessage={fieldErrors.type}
         >
           <SelectItem key="INCOME">Przychód</SelectItem>
           <SelectItem key="EXPENSE">Wydatek</SelectItem>
@@ -161,57 +180,48 @@ export function TransactionForm({
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Input
+        <DatePicker
           label="Data"
-          type="date"
-          value={formData.date}
-          onValueChange={(value) =>
-            setFormData((prev) => ({ ...prev, date: value }))
-          }
-          description="Data nie może być z przyszłości"
+          value={dateValue}
+          onChange={(value) => {
+            if (value) {
+              setDateValue(value);
+              setFieldErrors((prev) => ({ ...prev, date: undefined }));
+            }
+          }}
+          maxValue={getMaxSelectableDate()}
+          showMonthAndYearPickers
+          isInvalid={!!fieldErrors.date}
+          errorMessage={fieldErrors.date}
         />
 
-        <Select
+        <Autocomplete
           label="Kategoria"
-          selectedKeys={formData.categoryId ? [formData.categoryId] : []}
-          onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0] as string | undefined;
-            setFormData((prev) => ({
-              ...prev,
-              categoryId: selected || "",
-            }));
+          placeholder="Wyszukaj kategorię (opcjonalnie)"
+          selectedKey={categoryId || null}
+          onSelectionChange={(key) => {
+            setCategoryId((key as string) || "");
           }}
-          placeholder="Wybierz kategorię (opcjonalnie)"
+          allowsCustomValue={false}
         >
           {categories.map((category) => (
-            <SelectItem key={category.id}>{category.name}</SelectItem>
+            <AutocompleteItem key={category.id}>{category.name}</AutocompleteItem>
           ))}
-        </Select>
+        </Autocomplete>
       </div>
 
       <Textarea
         label="Opis"
-        value={formData.description}
-        onValueChange={(value: string) =>
-          setFormData((prev) => ({ ...prev, description: value }))
-        }
+        value={description}
+        onValueChange={(value: string) => {
+          setDescription(value);
+          setFieldErrors((prev) => ({ ...prev, description: undefined }));
+        }}
         placeholder="Opcjonalny opis transakcji"
-        description={`${formData.description.length}/500 znaków`}
+        description={`${description.length}/500 znaków`}
+        isInvalid={!!fieldErrors.description}
+        errorMessage={fieldErrors.description}
       />
-
-      {error && (
-        <div className="rounded-lg bg-danger-50 p-3 text-sm text-danger">
-          {error}
-        </div>
-      )}
-
-      {success && (
-        <div className="rounded-lg bg-success-50 p-3 text-sm text-success">
-          {isEditMode
-            ? "Transakcja została zaktualizowana!"
-            : "Transakcja została dodana pomyślnie!"}
-        </div>
-      )}
 
       <div className="flex gap-2">
         {onCancel && (
@@ -222,16 +232,9 @@ export function TransactionForm({
         <Button
           type="submit"
           color="primary"
-          isLoading={isPending}
           className={onCancel ? "flex-1" : "w-full"}
         >
-          {isPending
-            ? isEditMode
-              ? "Zapisywanie..."
-              : "Dodawanie..."
-            : isEditMode
-              ? "Zapisz"
-              : "Dodaj transakcję"}
+          {isEditMode ? "Zapisz" : "Dodaj transakcję"}
         </Button>
       </div>
     </form>

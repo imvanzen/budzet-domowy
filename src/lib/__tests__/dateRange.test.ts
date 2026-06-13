@@ -3,7 +3,10 @@ import { parseDate } from "@internationalized/date";
 import {
   validateTransactionDateRange,
   calendarDateRangeToDates,
+  getDateRangeFromPreset,
 } from "../dateRange";
+
+const REFERENCE_DATE = new Date(2026, 5, 13, 15, 30, 0);
 
 describe("validateTransactionDateRange", () => {
   it("should return null for empty range", () => {
@@ -38,6 +41,58 @@ describe("validateTransactionDateRange", () => {
         end: parseDate("2024-01-31"),
       })
     ).toBeNull();
+  });
+});
+
+describe("getDateRangeFromPreset", () => {
+  it("should use month-to-date for current month and rolling presets", () => {
+    const currentMonth = getDateRangeFromPreset(
+      "current-month",
+      undefined,
+      undefined,
+      REFERENCE_DATE,
+    );
+    const last3Months = getDateRangeFromPreset(
+      "last-3-months",
+      undefined,
+      undefined,
+      REFERENCE_DATE,
+    );
+
+    expect(currentMonth.dateFrom).toEqual(new Date(2026, 5, 1));
+    expect(currentMonth.dateTo).toEqual(new Date(2026, 5, 13, 23, 59, 59, 999));
+
+    expect(last3Months.dateFrom).toEqual(new Date(2026, 3, 1));
+    expect(last3Months.dateTo).toEqual(new Date(2026, 5, 13, 23, 59, 59, 999));
+
+    expect(currentMonth.dateTo.getTime()).toBe(last3Months.dateTo.getTime());
+    expect(currentMonth.dateFrom.getTime()).toBeGreaterThan(
+      last3Months.dateFrom.getTime(),
+    );
+  });
+
+  it("should use full previous calendar month", () => {
+    const { dateFrom, dateTo } = getDateRangeFromPreset(
+      "previous-month",
+      undefined,
+      undefined,
+      REFERENCE_DATE,
+    );
+
+    expect(dateFrom).toEqual(new Date(2026, 4, 1));
+    expect(dateTo).toEqual(new Date(2026, 4, 31, 23, 59, 59, 999));
+  });
+
+  it("should normalize custom range to start and end of day", () => {
+    const { dateFrom, dateTo } = getDateRangeFromPreset(
+      "custom",
+      "2026-04-10",
+      "2026-04-15",
+      REFERENCE_DATE,
+    );
+
+    expect(dateFrom).toEqual(new Date(2026, 3, 10));
+    expect(dateTo).toEqual(new Date(2026, 3, 15, 23, 59, 59, 999));
   });
 });
 

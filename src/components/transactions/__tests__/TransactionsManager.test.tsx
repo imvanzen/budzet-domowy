@@ -7,6 +7,15 @@ import type { PaginatedResult, TransactionWithCategory } from "@/services/transa
 
 vi.mock("@/app/transactions/actions", () => ({
   getFilteredTransactions: vi.fn(),
+  addTransaction: vi.fn(),
+}));
+
+vi.mock("@/lib/pending-transaction", () => ({
+  consumePendingTransaction: vi.fn(() => null),
+}));
+
+vi.mock("@/lib/sync-toast", () => ({
+  showSyncToast: vi.fn((operation: () => Promise<unknown>) => operation()),
 }));
 
 vi.mock("next/navigation", () => ({

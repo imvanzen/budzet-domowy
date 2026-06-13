@@ -13,11 +13,13 @@ import type { TransactionWithCategory } from "@/services/transactions";
 interface TransactionListProps {
   transactions: TransactionWithCategory[];
   currency: Currency;
+  pendingIds?: Set<string>;
 }
 
 export function TransactionList({
   transactions,
   currency,
+  pendingIds = new Set(),
 }: TransactionListProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -42,10 +44,15 @@ export function TransactionList({
   return (
     <>
       <div className="space-y-2">
-        {transactions.map((transaction) => (
+        {transactions.map((transaction) => {
+          const isPending = pendingIds.has(transaction.id);
+
+          return (
           <div
             key={transaction.id}
-            className="flex items-center justify-between gap-4 rounded-lg border border-default-200 p-4"
+            className={`flex items-center justify-between gap-4 rounded-lg border border-default-200 p-4 transition-opacity ${
+              isPending ? "opacity-70" : ""
+            }`}
           >
             <div className="flex-1">
               <div className="flex items-center gap-2">
@@ -60,6 +67,9 @@ export function TransactionList({
                     ? "Przychód"
                     : "Wydatek"}
                 </span>
+                {isPending && (
+                  <span className="text-xs text-default-400">Zapisywanie...</span>
+                )}
                 <span className="text-sm text-default-500">
                   {formatDate(transaction.date)}
                 </span>
@@ -89,7 +99,7 @@ export function TransactionList({
                 {formatCurrency(transaction.amount, currency)}
               </p>
               <Link href={`/transactions/${transaction.id}/edit`}>
-                <Button size="sm" variant="light">
+                <Button size="sm" variant="light" isDisabled={isPending}>
                   Edytuj
                 </Button>
               </Link>
@@ -97,13 +107,15 @@ export function TransactionList({
                 size="sm"
                 color="danger"
                 variant="light"
+                isDisabled={isPending}
                 onPress={() => setDeleteId(transaction.id)}
               >
                 Usuń
               </Button>
             </div>
           </div>
-        ))}
+        );
+        })}
       </div>
 
       <ConfirmModal

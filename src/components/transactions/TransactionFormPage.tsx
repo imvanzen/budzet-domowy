@@ -23,7 +23,7 @@ export function TransactionFormPage({
   };
 
   return (
-    <Card className="max-w-3xl">
+    <Card className="w-full">
       <CardHeader>
         <h2 className="text-xl font-semibold">{title}</h2>
       </CardHeader>
@@ -31,7 +31,6 @@ export function TransactionFormPage({
         <TransactionForm
           categories={categories}
           transaction={transaction}
-          onSuccess={handleNavigateBack}
           onCancel={handleNavigateBack}
         />
       </CardBody>

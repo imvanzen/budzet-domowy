@@ -14,8 +14,6 @@ import { revalidatePath } from "next/cache";
 import type { NewTransaction } from "@/db/schema";
 import type { ActionResult } from "@/types/actions";
 
-export type { ActionResult };
-
 function validateTransaction(input: {
   amount?: number;
   date?: Date;

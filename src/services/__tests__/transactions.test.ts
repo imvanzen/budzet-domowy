@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { useTestDb } from "@/__tests__/db/helpers";
 import { seedTestDb } from "@/__tests__/db/fixtures";
-import { transactionType, transactions } from "@/db/schema";
-import { desc, eq, and, gte, lte } from "drizzle-orm";
+import { transactionType, transactions, categories } from "@/db/schema";
+import { desc, eq, and, gte, lte, or, exists, sql } from "drizzle-orm";
 
 // We need to replace the db import in the service module
 // Since services use a global db import, we'll test the logic by
@@ -178,6 +178,45 @@ describe("Transactions Service Logic", () => {
         expect(date.getTime()).toBeLessThanOrEqual(dateTo.getTime());
         expect(t.type).toBe(transactionType.EXPENSE);
       });
+    });
+
+    it("should filter by query in description", async () => {
+      const { db } = testDb;
+      const pattern = "%grocery%";
+
+      const result = await db.query.transactions.findMany({
+        where: sql`lower(${transactions.description}) like lower(${pattern})`,
+        orderBy: [desc(transactions.date)],
+      });
+
+      expect(result).toHaveLength(1);
+      expect(result[0]?.description).toBe("Grocery shopping");
+    });
+
+    it("should filter by query in category name", async () => {
+      const { db } = testDb;
+      const pattern = "%transport%";
+
+      const result = await db.query.transactions.findMany({
+        where: or(
+          sql`lower(${transactions.description}) like lower(${pattern})`,
+          exists(
+            db
+              .select({ one: sql`1` })
+              .from(categories)
+              .where(
+                and(
+                  eq(categories.id, transactions.categoryId),
+                  sql`lower(${categories.name}) like lower(${pattern})`,
+                ),
+              ),
+          ),
+        ),
+        orderBy: [desc(transactions.date)],
+      });
+
+      expect(result).toHaveLength(1);
+      expect(result[0]?.description).toBe("Bus ticket");
     });
   });
 

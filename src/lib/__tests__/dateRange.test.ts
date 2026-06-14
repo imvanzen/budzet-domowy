@@ -4,6 +4,10 @@ import {
   validateTransactionDateRange,
   calendarDateRangeToDates,
   getDateRangeFromPreset,
+  getTransactionDateRangeFromPreset,
+  getCalendarRangeFromTransactionPreset,
+  detectTransactionPeriodPreset,
+  DEFAULT_TRANSACTION_PERIOD_PRESET,
 } from "../dateRange";
 
 const REFERENCE_DATE = new Date(2026, 5, 13, 15, 30, 0);
@@ -93,6 +97,49 @@ describe("getDateRangeFromPreset", () => {
 
     expect(dateFrom).toEqual(new Date(2026, 3, 10));
     expect(dateTo).toEqual(new Date(2026, 3, 15, 23, 59, 59, 999));
+  });
+});
+
+describe("transaction period presets", () => {
+  it("should default to current year range", () => {
+    const range = getCalendarRangeFromTransactionPreset(
+      DEFAULT_TRANSACTION_PERIOD_PRESET,
+      null,
+      REFERENCE_DATE,
+    );
+
+    expect(range.start).toEqual(parseDate("2026-01-01"));
+    expect(range.end).toEqual(parseDate("2026-06-13"));
+  });
+
+  it("should calculate previous year as full calendar year", () => {
+    const { dateFrom, dateTo } = getTransactionDateRangeFromPreset(
+      "previous-year",
+      undefined,
+      undefined,
+      REFERENCE_DATE,
+    );
+
+    expect(dateFrom).toEqual(new Date(2025, 0, 1));
+    expect(dateTo).toEqual(new Date(2025, 11, 31, 23, 59, 59, 999));
+  });
+
+  it("should detect matching preset from calendar range", () => {
+    const range = getCalendarRangeFromTransactionPreset(
+      "current-month",
+      null,
+      REFERENCE_DATE,
+    );
+
+    expect(detectTransactionPeriodPreset(range, REFERENCE_DATE)).toBe(
+      "current-month",
+    );
+    expect(
+      detectTransactionPeriodPreset(
+        { start: parseDate("2026-02-10"), end: parseDate("2026-03-05") },
+        REFERENCE_DATE,
+      ),
+    ).toBe("custom");
   });
 });
 

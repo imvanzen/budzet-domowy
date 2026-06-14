@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@/__tests__/test-utils";
+import { render, screen, waitFor, within } from "@/__tests__/test-utils";
 import { TransactionsManager } from "../TransactionsManager";
 import { transactionType } from "@/db/schema";
 import type { Category } from "@/db/schema";
@@ -21,8 +21,11 @@ vi.mock("@/lib/sync-toast", () => ({
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: vi.fn(),
+    replace: vi.fn(),
     refresh: vi.fn(),
   }),
+  usePathname: () => "/transactions",
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 import { getFilteredTransactions } from "@/app/transactions/actions";
@@ -120,6 +123,7 @@ describe("TransactionsManager", () => {
       expect(screen.getAllByLabelText("Typ transakcji")[0]).toBeInTheDocument();
       expect(screen.getAllByLabelText("Kategoria")[0]).toBeInTheDocument();
       expect(screen.getAllByLabelText("Zakres dat")[0]).toBeInTheDocument();
+      expect(screen.getAllByLabelText("Szukaj")[0]).toBeInTheDocument();
     });
 
     it("should display total transaction count", () => {
@@ -181,7 +185,9 @@ describe("TransactionsManager", () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByText("1")).toBeInTheDocument();
+        const header = screen.getByText("Lista transakcji").parentElement;
+        expect(header).not.toBeNull();
+        expect(within(header as HTMLElement).getByText("1")).toBeInTheDocument();
       });
     });
   });

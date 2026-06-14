@@ -1,30 +1,24 @@
 "use client";
 
-import { useState, useTransition, useEffect, useRef } from "react";
+import { useState, useTransition, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
 import { Pagination } from "@heroui/react";
-import type { DateValue } from "@internationalized/date";
-import type { RangeValue } from "@react-types/shared";
 import { TransactionList } from "./TransactionList";
 import { TransactionFilters } from "./TransactionFilters";
-import type { Category, TransactionType, Currency } from "@/db/schema";
+import type { Category, Currency } from "@/db/schema";
 import { Chip } from "@heroui/react";
 import {
   addTransaction,
   getFilteredTransactions,
 } from "@/app/transactions/actions";
 import type { PaginatedResult, TransactionWithCategory } from "@/services/transactions";
-import {
-  calendarDateRangeToDates,
-  validateTransactionDateRange,
-} from "@/lib/dateRange";
-import {
-  consumePendingTransaction,
-} from "@/lib/pending-transaction";
+import { buildTransactionFiltersFromUrlState } from "@/lib/transaction-filters-url";
+import { consumePendingTransaction } from "@/lib/pending-transaction";
 import { showSyncToast } from "@/lib/sync-toast";
+import { useTransactionFiltersUrl } from "@/hooks/use-transaction-filters-url";
 
 type TransactionsManagerProps = {
   initialData: PaginatedResult<TransactionWithCategory>;
@@ -38,11 +32,35 @@ export function TransactionsManager({
   currency,
 }: TransactionsManagerProps) {
   const router = useRouter();
+  const categoryIds = useMemo(
+    () => categories.map((category) => category.id),
+    [categories],
+  );
+
+  const {
+    selectedType,
+    selectedCategoryId,
+    datePreset,
+    dateRange,
+    searchInput,
+    debouncedSearchPhrase,
+    page,
+    setType,
+    setCategoryId,
+    setDateFilter,
+    setSearchInput,
+    setPage,
+  } = useTransactionFiltersUrl({
+    categoryIds,
+  });
+
+  const dateRangeKey = useMemo(
+    () =>
+      `${dateRange.start.year}-${dateRange.start.month}-${dateRange.start.day}:${dateRange.end.year}-${dateRange.end.month}-${dateRange.end.day}`,
+    [dateRange],
+  );
+
   const [data, setData] = useState(initialData);
-  const [page, setPage] = useState(initialData.page);
-  const [selectedType, setSelectedType] = useState<TransactionType | "ALL">("ALL");
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | "ALL">("ALL");
-  const [dateRange, setDateRange] = useState<RangeValue<DateValue> | null>(null);
   const [isPending, startTransition] = useTransition();
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
   const pendingSyncStarted = useRef(false);
@@ -88,7 +106,13 @@ export function TransactionsManager({
               throw new Error(result.error);
             }
 
-            const refreshed = await getFilteredTransactions(undefined, 1);
+            const filters = buildTransactionFiltersFromUrlState({
+              selectedType,
+              selectedCategoryId,
+              dateRange,
+              searchPhrase: debouncedSearchPhrase,
+            });
+            const refreshed = await getFilteredTransactions(filters, 1);
             setData(refreshed);
             setPage(1);
             router.refresh();
@@ -114,62 +138,38 @@ export function TransactionsManager({
         });
       }
     });
-  }, [router]);
+  }, [
+    router,
+    selectedType,
+    selectedCategoryId,
+    dateRange,
+    debouncedSearchPhrase,
+    setPage,
+  ]);
 
   useEffect(() => {
     const fetchFilteredTransactions = () => {
       startTransition(async () => {
-        const filters: {
-          type?: TransactionType;
-          categoryId?: string;
-          dateFrom?: Date;
-          dateTo?: Date;
-        } = {};
+        const filters = buildTransactionFiltersFromUrlState({
+          selectedType,
+          selectedCategoryId,
+          dateRange,
+          searchPhrase: debouncedSearchPhrase,
+        });
 
-        if (selectedType !== "ALL") {
-          filters.type = selectedType;
-        }
-
-        if (selectedCategoryId !== "ALL") {
-          filters.categoryId = selectedCategoryId;
-        }
-
-        if (
-          dateRange?.start &&
-          dateRange?.end &&
-          !validateTransactionDateRange(dateRange)
-        ) {
-          const { dateFrom, dateTo } = calendarDateRangeToDates(dateRange);
-          filters.dateFrom = dateFrom;
-          filters.dateTo = dateTo;
-        }
-
-        const result = await getFilteredTransactions(
-          Object.keys(filters).length > 0 ? filters : undefined,
-          page
-        );
-
+        const result = await getFilteredTransactions(filters, page);
         setData(result);
       });
     };
 
     fetchFilteredTransactions();
-  }, [selectedType, selectedCategoryId, dateRange, page]);
-
-  const handleTypeChange = (type: TransactionType | "ALL") => {
-    setSelectedType(type);
-    setPage(1);
-  };
-
-  const handleCategoryChange = (categoryId: string | "ALL") => {
-    setSelectedCategoryId(categoryId);
-    setPage(1);
-  };
-
-  const handleDateRangeChange = (range: RangeValue<DateValue> | null) => {
-    setDateRange(range);
-    setPage(1);
-  };
+  }, [
+    selectedType,
+    selectedCategoryId,
+    dateRangeKey,
+    debouncedSearchPhrase,
+    page,
+  ]);
 
   return (
     <Card>
@@ -192,10 +192,13 @@ export function TransactionsManager({
             categories={categories}
             selectedType={selectedType}
             selectedCategoryId={selectedCategoryId}
+            datePreset={datePreset}
             dateRange={dateRange}
-            onTypeChange={handleTypeChange}
-            onCategoryChange={handleCategoryChange}
-            onDateRangeChange={handleDateRangeChange}
+            searchPhrase={searchInput}
+            onTypeChange={setType}
+            onCategoryChange={setCategoryId}
+            onDateFilterChange={setDateFilter}
+            onSearchChange={setSearchInput}
           />
 
           {isPending && (

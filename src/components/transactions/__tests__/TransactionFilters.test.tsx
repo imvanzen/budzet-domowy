@@ -1,9 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@/__tests__/test-utils";
+import userEvent from "@testing-library/user-event";
+import { parseDate } from "@internationalized/date";
 import { TransactionFilters } from "../TransactionFilters";
 import type { Category } from "@/db/schema";
 
-// Mock next/navigation
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: vi.fn(),
@@ -35,108 +36,50 @@ describe("TransactionFilters", () => {
 
   const mockOnTypeChange = vi.fn();
   const mockOnCategoryChange = vi.fn();
-  const mockOnDateRangeChange = vi.fn();
+  const mockOnDateFilterChange = vi.fn();
+  const mockOnSearchChange = vi.fn();
+
+  const defaultDateRange = {
+    start: parseDate("2026-01-01"),
+    end: parseDate("2026-06-13"),
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("rendering", () => {
-    it("should render type, category and date range filters", () => {
-      render(
-        <TransactionFilters
-          categories={mockCategories}
-          selectedType="ALL"
-          selectedCategoryId="ALL"
-          onTypeChange={mockOnTypeChange}
-          onCategoryChange={mockOnCategoryChange}
-          onDateRangeChange={mockOnDateRangeChange}
-        />
-      );
+  const defaultProps = {
+    categories: mockCategories,
+    selectedType: "ALL" as const,
+    selectedCategoryId: "ALL" as const,
+    datePreset: "current-year" as const,
+    dateRange: defaultDateRange,
+    onTypeChange: mockOnTypeChange,
+    onCategoryChange: mockOnCategoryChange,
+    onDateFilterChange: mockOnDateFilterChange,
+    onSearchChange: mockOnSearchChange,
+  };
 
+  describe("rendering", () => {
+    it("should render search, type, category and date range filters", () => {
+      render(<TransactionFilters {...defaultProps} />);
+
+      expect(screen.getAllByLabelText("Szukaj")[0]).toBeInTheDocument();
       expect(screen.getAllByLabelText("Typ transakcji")[0]).toBeInTheDocument();
       expect(screen.getAllByLabelText("Kategoria")[0]).toBeInTheDocument();
       expect(screen.getAllByLabelText("Zakres dat")[0]).toBeInTheDocument();
-    });
-
-    it("should display all category options", () => {
-      render(
-        <TransactionFilters
-          categories={mockCategories}
-          selectedType="ALL"
-          selectedCategoryId="ALL"
-          onTypeChange={mockOnTypeChange}
-          onCategoryChange={mockOnCategoryChange}
-          onDateRangeChange={mockOnDateRangeChange}
-        />
-      );
-
-      const categorySelect = screen.getAllByLabelText("Kategoria")[0];
-      expect(categorySelect).toBeInTheDocument();
-    });
-
-    it("should show selected type", () => {
-      render(
-        <TransactionFilters
-          categories={mockCategories}
-          selectedType="INCOME"
-          selectedCategoryId="ALL"
-          onTypeChange={mockOnTypeChange}
-          onCategoryChange={mockOnCategoryChange}
-          onDateRangeChange={mockOnDateRangeChange}
-        />
-      );
-
-      expect(screen.getAllByLabelText("Typ transakcji")[0]).toBeInTheDocument();
-    });
-
-    it("should show selected category", () => {
-      render(
-        <TransactionFilters
-          categories={mockCategories}
-          selectedType="ALL"
-          selectedCategoryId="cat-1"
-          onTypeChange={mockOnTypeChange}
-          onCategoryChange={mockOnCategoryChange}
-          onDateRangeChange={mockOnDateRangeChange}
-        />
-      );
-
-      expect(screen.getAllByLabelText("Kategoria")[0]).toBeInTheDocument();
     });
   });
 
   describe("interactions", () => {
-    it("should render with correct selected values", () => {
-      render(
-        <TransactionFilters
-          categories={mockCategories}
-          selectedType="INCOME"
-          selectedCategoryId="cat-1"
-          onTypeChange={mockOnTypeChange}
-          onCategoryChange={mockOnCategoryChange}
-          onDateRangeChange={mockOnDateRangeChange}
-        />
-      );
+    it("should call onSearchChange when typing in search field", async () => {
+      const user = userEvent.setup();
+      render(<TransactionFilters {...defaultProps} />);
 
-      expect(screen.getAllByLabelText("Typ transakcji")[0]).toBeInTheDocument();
-      expect(screen.getAllByLabelText("Kategoria")[0]).toBeInTheDocument();
-      expect(screen.getAllByLabelText("Zakres dat")[0]).toBeInTheDocument();
-    });
+      const searchInput = screen.getAllByLabelText("Szukaj")[0];
+      await user.type(searchInput, "kino");
 
-    it("should render all categories in the list", () => {
-      render(
-        <TransactionFilters
-          categories={mockCategories}
-          selectedType="ALL"
-          selectedCategoryId="ALL"
-          onTypeChange={mockOnTypeChange}
-          onCategoryChange={mockOnCategoryChange}
-          onDateRangeChange={mockOnDateRangeChange}
-        />
-      );
-
-      expect(screen.getAllByLabelText("Kategoria")[0]).toBeInTheDocument();
+      expect(mockOnSearchChange).toHaveBeenCalled();
     });
   });
 });

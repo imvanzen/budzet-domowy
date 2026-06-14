@@ -1,52 +1,55 @@
 "use client";
 
-import { Select, SelectItem, DateRangePicker } from "@heroui/react";
+import { Select, SelectItem } from "@heroui/react";
+import { Input } from "@heroui/input";
 import type { DateValue } from "@internationalized/date";
 import type { RangeValue } from "@react-types/shared";
 import type { Category, TransactionType } from "@/db/schema";
 import { transactionType } from "@/db/schema";
-import {
-  getMaxSelectableDate,
-  validateTransactionDateRange,
-} from "@/lib/dateRange";
+import { type TransactionPeriodPreset } from "@/lib/dateRange";
+import { TransactionDateRangeFilter } from "./TransactionDateRangeFilter";
 
 type TransactionFiltersProps = {
   categories: Category[];
   selectedType?: TransactionType | "ALL";
   selectedCategoryId?: string | "ALL";
-  dateRange?: RangeValue<DateValue> | null;
+  datePreset: TransactionPeriodPreset;
+  dateRange: RangeValue<DateValue>;
+  searchPhrase?: string;
   onTypeChange: (type: TransactionType | "ALL") => void;
   onCategoryChange: (categoryId: string | "ALL") => void;
-  onDateRangeChange: (range: RangeValue<DateValue> | null) => void;
+  onDateFilterChange: (
+    preset: TransactionPeriodPreset,
+    range: RangeValue<DateValue>,
+  ) => void;
+  onSearchChange: (phrase: string) => void;
 };
 
 export function TransactionFilters({
   categories,
   selectedType = "ALL",
   selectedCategoryId = "ALL",
-  dateRange = null,
+  datePreset,
+  dateRange,
+  searchPhrase = "",
   onTypeChange,
   onCategoryChange,
-  onDateRangeChange,
+  onDateFilterChange,
+  onSearchChange,
 }: TransactionFiltersProps) {
-  const maxDate = getMaxSelectableDate();
-
-  const handleDateRangeChange = (value: RangeValue<DateValue> | null) => {
-    if (!value?.start || !value?.end) {
-      onDateRangeChange(value);
-      return;
-    }
-
-    const error = validateTransactionDateRange(value);
-    if (error) {
-      return;
-    }
-
-    onDateRangeChange(value);
-  };
-
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+    <div className="space-y-4">
+      <Input
+        label="Szukaj"
+        placeholder="Wyszukaj w nazwie lub opisie..."
+        value={searchPhrase}
+        onValueChange={onSearchChange}
+        aria-label="Szukaj"
+        isClearable
+        onClear={() => onSearchChange("")}
+      />
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
       <Select
         label="Typ transakcji"
         selectedKeys={selectedType ? [selectedType] : []}
@@ -80,18 +83,12 @@ export function TransactionFilters({
         ))}
       </Select>
 
-      <DateRangePicker
-        label="Zakres dat"
-        value={dateRange}
-        onChange={handleDateRangeChange}
-        maxValue={maxDate}
-        validate={(value) => {
-          const error = validateTransactionDateRange(value);
-          return error ?? true;
-        }}
-        validationBehavior="aria"
-        aria-label="Zakres dat"
+      <TransactionDateRangeFilter
+        preset={datePreset}
+        dateRange={dateRange}
+        onDateFilterChange={onDateFilterChange}
       />
+      </div>
     </div>
   );
 }

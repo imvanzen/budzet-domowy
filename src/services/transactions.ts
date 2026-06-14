@@ -1,6 +1,6 @@
 import db from "@/db";
-import { transactions } from "@/db/schema";
-import { desc, eq, and, gte, lte, count } from "drizzle-orm";
+import { transactions, categories } from "@/db/schema";
+import { desc, eq, and, gte, lte, count, or, exists, sql } from "drizzle-orm";
 import type { NewTransaction, Transaction, TransactionType } from "@/db/schema";
 
 export const DEFAULT_PAGE_SIZE = 10;
@@ -62,7 +62,12 @@ export type TransactionFilters = {
   dateTo?: Date;
   type?: TransactionType;
   categoryId?: string;
+  query?: string;
 };
+
+function escapeLikePattern(value: string): string {
+  return value.replace(/[\\%_]/g, (char) => `\\${char}`);
+}
 
 function buildTransactionConditions(filters?: TransactionFilters) {
   const conditions = [];
@@ -78,6 +83,28 @@ function buildTransactionConditions(filters?: TransactionFilters) {
   }
   if (filters?.categoryId) {
     conditions.push(eq(transactions.categoryId, filters.categoryId));
+  }
+  if (filters?.query) {
+    const trimmed = filters.query.trim();
+    if (trimmed) {
+      const pattern = `%${escapeLikePattern(trimmed)}%`;
+      conditions.push(
+        or(
+          sql`lower(${transactions.description}) like lower(${pattern})`,
+          exists(
+            db
+              .select({ one: sql`1` })
+              .from(categories)
+              .where(
+                and(
+                  eq(categories.id, transactions.categoryId),
+                  sql`lower(${categories.name}) like lower(${pattern})`,
+                ),
+              ),
+          ),
+        ),
+      );
+    }
   }
 
   return conditions.length > 0 ? and(...conditions) : undefined;

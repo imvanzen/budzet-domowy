@@ -5,8 +5,6 @@ import { revalidatePath } from "next/cache";
 import type { NewCategory } from "@/db/schema";
 import type { ActionResult } from "@/types/actions";
 
-export type { ActionResult };
-
 export async function addCategory(
   input: Omit<NewCategory, "id" | "createdAt" | "updatedAt">
 ): Promise<ActionResult<{ id: string }>> {

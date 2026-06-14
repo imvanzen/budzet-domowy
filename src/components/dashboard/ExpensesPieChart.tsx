@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardBody, CardHeader } from "@heroui/card";
+import { HiChartPie } from "react-icons/hi2";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { formatCurrency } from "@/lib/format";
 import type { Currency } from "@/db/schema";
@@ -29,11 +30,13 @@ export function ExpensesPieChart({ data, currency }: ExpensesPieChartProps) {
   if (data.length === 0) {
     return (
       <Card>
-        <CardHeader>
+        <CardHeader className="flex items-center gap-2">
+          <HiChartPie className="text-xl text-danger" aria-hidden />
           <h3 className="text-lg font-semibold">Wydatki wg kategorii</h3>
         </CardHeader>
         <CardBody>
-          <div className="flex h-80 items-center justify-center">
+          <div className="flex h-80 flex-col items-center justify-center gap-2">
+            <HiChartPie className="text-4xl text-default-300" aria-hidden />
             <p className="text-center text-default-500">Brak danych do wyświetlenia</p>
           </div>
         </CardBody>
@@ -62,7 +65,8 @@ export function ExpensesPieChart({ data, currency }: ExpensesPieChartProps) {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex items-center gap-2">
+        <HiChartPie className="text-xl text-danger" aria-hidden />
         <h3 className="text-lg font-semibold">Wydatki wg kategorii</h3>
       </CardHeader>
       <CardBody>

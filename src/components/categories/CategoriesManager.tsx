@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Card, CardBody, CardHeader } from "@heroui/card";
+import { HiPlusCircle, HiQueueList } from "react-icons/hi2";
 import { CategoryForm } from "./CategoryForm";
 import { CategoryList } from "./CategoryList";
 import type { Category } from "@/db/schema";
@@ -29,7 +30,8 @@ export function CategoriesManager({ initialCategories }: CategoriesManagerProps)
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       <Card className="lg:col-span-1">
-        <CardHeader>
+        <CardHeader className="flex items-center gap-2">
+          <HiPlusCircle className="text-xl text-primary" aria-hidden />
           <h2 className="text-xl font-semibold">
             {editingCategory ? "Edytuj kategorię" : "Dodaj Kategorię"}
           </h2>
@@ -44,7 +46,8 @@ export function CategoriesManager({ initialCategories }: CategoriesManagerProps)
       </Card>
 
       <Card className="lg:col-span-2">
-        <CardHeader>
+        <CardHeader className="flex items-center gap-2">
+          <HiQueueList className="text-xl text-primary" aria-hidden />
           <h2 className="text-xl font-semibold">Lista Kategorii</h2>
         </CardHeader>
         <CardBody>

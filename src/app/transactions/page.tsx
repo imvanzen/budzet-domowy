@@ -1,8 +1,10 @@
 import { Suspense } from "react";
-import { getPaginatedTransactions } from "@/services/transactions";
+import { HiArrowsRightLeft } from "react-icons/hi2";
+import { TransactionsSkeleton } from "@/components/skeletons/TransactionsSkeleton";
+import { TransactionsManager } from "@/components/transactions/TransactionsManager";
 import { getCategories } from "@/services/categories";
 import { getSettings } from "@/services/settings";
-import { TransactionsManager } from "@/components/transactions/TransactionsManager";
+import { getPaginatedTransactions } from "@/services/transactions";
 
 async function TransactionsContent() {
   const [initialData, categories, settings] = await Promise.all([
@@ -12,30 +14,27 @@ async function TransactionsContent() {
   ]);
 
   return (
-    <div className="container mx-auto max-w-6xl space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Transakcje</h1>
-      </div>
-
-      <TransactionsManager
-        initialData={initialData}
-        categories={categories}
-        currency={settings.currency}
-      />
-    </div>
+    <TransactionsManager
+      initialData={initialData}
+      categories={categories}
+      currency={settings.currency}
+    />
   );
 }
 
 export default function TransactionsPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="container mx-auto max-w-6xl p-6">
-          <div className="text-center">Ładowanie...</div>
-        </div>
-      }
-    >
-      <TransactionsContent />
-    </Suspense>
+    <div className="container mx-auto max-w-6xl space-y-6 p-6">
+      <div className="flex items-center justify-between">
+        <h1 className="flex items-center gap-3 text-3xl font-bold">
+          <HiArrowsRightLeft className="text-primary" aria-hidden />
+          Transakcje
+        </h1>
+      </div>
+
+      <Suspense fallback={<TransactionsSkeleton />}>
+        <TransactionsContent />
+      </Suspense>
+    </div>
   );
 }

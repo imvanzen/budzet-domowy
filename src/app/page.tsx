@@ -1,7 +1,9 @@
 import { Suspense } from "react";
+import { HiHome } from "react-icons/hi2";
 import { getDashboardData } from "@/app/actions";
-import { getSettings } from "@/services/settings";
 import { DashboardContent } from "@/components/dashboard/DashboardContent";
+import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
+import { getSettings } from "@/services/settings";
 
 async function Dashboard() {
   const [dashboardData, settings] = await Promise.all([
@@ -10,26 +12,26 @@ async function Dashboard() {
   ]);
 
   return (
-    <div className="container mx-auto max-w-7xl space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Budżet Domowy</h1>
-      </div>
-
-      <DashboardContent initialData={dashboardData} currency={settings.currency} />
-    </div>
+    <DashboardContent
+      initialData={dashboardData}
+      currency={settings.currency}
+    />
   );
 }
 
 export default function Home() {
   return (
-    <Suspense
-      fallback={
-        <div className="container mx-auto max-w-7xl p-6">
-          <div className="text-center">Ładowanie...</div>
-        </div>
-      }
-    >
-      <Dashboard />
-    </Suspense>
+    <div className="container mx-auto max-w-7xl space-y-6 p-6">
+      <div className="flex items-center justify-between">
+        <h1 className="flex items-center gap-3 text-3xl font-bold">
+          <HiHome className="text-primary" aria-hidden />
+          Budżet Domowy
+        </h1>
+      </div>
+
+      <Suspense fallback={<DashboardSkeleton />}>
+        <Dashboard />
+      </Suspense>
+    </div>
   );
 }

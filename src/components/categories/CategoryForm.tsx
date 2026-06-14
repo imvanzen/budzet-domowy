@@ -3,6 +3,7 @@
 import { useState, useTransition, useEffect } from "react";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
+import { HiPlus, HiCheck, HiXMark } from "react-icons/hi2";
 import { addCategory, editCategory } from "@/app/categories/actions";
 import type { Category } from "@/db/schema";
 
@@ -91,7 +92,12 @@ export function CategoryForm({
 
       <div className="flex gap-2">
         {isEditMode && onCancel && (
-          <Button variant="light" onPress={onCancel} className="flex-1">
+          <Button
+            variant="light"
+            onPress={onCancel}
+            className="flex-1"
+            startContent={<HiXMark aria-hidden />}
+          >
             Anuluj
           </Button>
         )}
@@ -100,6 +106,15 @@ export function CategoryForm({
           color="primary"
           isLoading={isPending}
           className={isEditMode ? "flex-1" : "w-full"}
+          startContent={
+            !isPending ? (
+              isEditMode ? (
+                <HiCheck aria-hidden />
+              ) : (
+                <HiPlus aria-hidden />
+              )
+            ) : undefined
+          }
         >
           {isPending
             ? isEditMode

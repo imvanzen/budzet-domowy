@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { Card, CardBody, CardHeader } from "@heroui/card";
+import { HiPencilSquare, HiPlusCircle } from "react-icons/hi2";
 import { TransactionForm } from "./TransactionForm";
 import type { Category, Transaction } from "@/db/schema";
 
@@ -24,7 +25,12 @@ export function TransactionFormPage({
 
   return (
     <Card className="w-full">
-      <CardHeader>
+      <CardHeader className="flex items-center gap-2">
+        {transaction ? (
+          <HiPencilSquare className="text-xl text-primary" aria-hidden />
+        ) : (
+          <HiPlusCircle className="text-xl text-primary" aria-hidden />
+        )}
         <h2 className="text-xl font-semibold">{title}</h2>
       </CardHeader>
       <CardBody>

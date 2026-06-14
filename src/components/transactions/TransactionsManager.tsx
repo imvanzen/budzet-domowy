@@ -1,24 +1,28 @@
 "use client";
 
-import { useState, useTransition, useEffect, useRef, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Button } from "@heroui/button";
+import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Link } from "@heroui/link";
-import { Pagination } from "@heroui/react";
-import { TransactionList } from "./TransactionList";
-import { TransactionFilters } from "./TransactionFilters";
-import type { Category, Currency } from "@/db/schema";
-import { Chip } from "@heroui/react";
+import { Chip, Pagination } from "@heroui/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { HiClipboardDocumentList, HiPlus } from "react-icons/hi2";
 import {
   addTransaction,
   getFilteredTransactions,
 } from "@/app/transactions/actions";
-import type { PaginatedResult, TransactionWithCategory } from "@/services/transactions";
-import { buildTransactionFiltersFromUrlState } from "@/lib/transaction-filters-url";
+import { TransactionListSkeleton } from "@/components/skeletons/TransactionListSkeleton";
+import type { Category, Currency } from "@/db/schema";
+import { useTransactionFiltersUrl } from "@/hooks/use-transaction-filters-url";
 import { consumePendingTransaction } from "@/lib/pending-transaction";
 import { showSyncToast } from "@/lib/sync-toast";
-import { useTransactionFiltersUrl } from "@/hooks/use-transaction-filters-url";
+import { buildTransactionFiltersFromUrlState } from "@/lib/transaction-filters-url";
+import type {
+  PaginatedResult,
+  TransactionWithCategory,
+} from "@/services/transactions";
+import { TransactionFilters } from "./TransactionFilters";
+import { TransactionList } from "./TransactionList";
 
 type TransactionsManagerProps = {
   initialData: PaginatedResult<TransactionWithCategory>;
@@ -53,12 +57,6 @@ export function TransactionsManager({
   } = useTransactionFiltersUrl({
     categoryIds,
   });
-
-  const dateRangeKey = useMemo(
-    () =>
-      `${dateRange.start.year}-${dateRange.start.month}-${dateRange.start.day}:${dateRange.end.year}-${dateRange.end.month}-${dateRange.end.day}`,
-    [dateRange],
-  );
 
   const [data, setData] = useState(initialData);
   const [isPending, startTransition] = useTransition();
@@ -166,7 +164,7 @@ export function TransactionsManager({
   }, [
     selectedType,
     selectedCategoryId,
-    dateRangeKey,
+    dateRange,
     debouncedSearchPhrase,
     page,
   ]);
@@ -176,13 +174,19 @@ export function TransactionsManager({
       <CardHeader>
         <div className="flex w-full items-center justify-between gap-4">
           <div className="flex items-center gap-3">
+            <HiClipboardDocumentList
+              className="text-xl text-primary"
+              aria-hidden
+            />
             <h2 className="text-xl font-semibold">Lista transakcji</h2>
             <Chip color="primary" size="sm" variant="solid">
               {data.total}
             </Chip>
           </div>
           <Link href="/transactions/new">
-            <Button color="primary">Dodaj transakcję</Button>
+            <Button color="primary" startContent={<HiPlus aria-hidden />}>
+              Dodaj transakcję
+            </Button>
           </Link>
         </div>
       </CardHeader>
@@ -201,17 +205,15 @@ export function TransactionsManager({
             onSearchChange={setSearchInput}
           />
 
-          {isPending && (
-            <div className="text-center text-default-500">Ładowanie...</div>
-          )}
-
-          <div className={isPending ? "opacity-50" : ""}>
+          {isPending ? (
+            <TransactionListSkeleton rows={data.items.length || 5} />
+          ) : (
             <TransactionList
               transactions={data.items}
               currency={currency}
               pendingIds={pendingIds}
             />
-          </div>
+          )}
 
           {data.totalPages > 1 && (
             <div className="flex justify-center pt-2">

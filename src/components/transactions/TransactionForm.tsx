@@ -6,6 +6,11 @@ import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 import {
+  HiCheck,
+  HiPlus,
+  HiXMark,
+} from "react-icons/hi2";
+import {
   Textarea,
   DatePicker,
   Autocomplete,
@@ -225,7 +230,12 @@ export function TransactionForm({
 
       <div className="flex gap-2">
         {onCancel && (
-          <Button variant="light" onPress={onCancel} className="flex-1">
+          <Button
+            variant="light"
+            onPress={onCancel}
+            className="flex-1"
+            startContent={<HiXMark aria-hidden />}
+          >
             Anuluj
           </Button>
         )}
@@ -233,6 +243,9 @@ export function TransactionForm({
           type="submit"
           color="primary"
           className={onCancel ? "flex-1" : "w-full"}
+          startContent={
+            isEditMode ? <HiCheck aria-hidden /> : <HiPlus aria-hidden />
+          }
         >
           {isEditMode ? "Zapisz" : "Dodaj transakcję"}
         </Button>

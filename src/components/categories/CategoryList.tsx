@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@heroui/button";
+import { HiPencil, HiTrash, HiTag, HiFolderOpen } from "react-icons/hi2";
 import type { Category } from "@/db/schema";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
 import { removeCategory } from "@/app/categories/actions";
@@ -27,6 +28,7 @@ export function CategoryList({ categories, onEdit }: CategoryListProps) {
   if (categories.length === 0) {
     return (
       <div className="rounded-lg border border-default-200 p-8 text-center">
+        <HiFolderOpen className="mx-auto mb-3 text-4xl text-default-300" aria-hidden />
         <p className="text-default-500">Brak kategorii</p>
       </div>
     );
@@ -40,12 +42,18 @@ export function CategoryList({ categories, onEdit }: CategoryListProps) {
             key={category.id}
             className="flex items-center justify-between gap-4 rounded-lg border border-default-200 p-4"
           >
-            <div className="flex-1">
+            <div className="flex flex-1 items-center gap-2">
+              <HiTag className="text-primary" aria-hidden />
               <p className="font-medium">{category.name}</p>
             </div>
             <div className="flex items-center gap-2">
               {onEdit && (
-                <Button size="sm" variant="light" onPress={() => onEdit(category)}>
+                <Button
+                  size="sm"
+                  variant="light"
+                  onPress={() => onEdit(category)}
+                  startContent={<HiPencil aria-hidden />}
+                >
                   Edytuj
                 </Button>
               )}
@@ -54,6 +62,7 @@ export function CategoryList({ categories, onEdit }: CategoryListProps) {
                 color="danger"
                 variant="light"
                 onPress={() => setDeleteId(category.id)}
+                startContent={<HiTrash aria-hidden />}
               >
                 Usuń
               </Button>

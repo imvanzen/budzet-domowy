@@ -1,6 +1,7 @@
 "use client";
 
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@heroui/react";
+import { HiExclamationTriangle } from "react-icons/hi2";
 
 type ConfirmModalProps = {
   isOpen: boolean;
@@ -26,7 +27,12 @@ export function ConfirmModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalContent>
-        <ModalHeader>{title}</ModalHeader>
+        <ModalHeader className="flex items-center gap-2">
+          {isDanger && (
+            <HiExclamationTriangle className="text-xl text-danger" aria-hidden />
+          )}
+          {title}
+        </ModalHeader>
         <ModalBody>
           <p>{message}</p>
         </ModalBody>

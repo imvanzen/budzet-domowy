@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Select, SelectItem } from "@heroui/select";
+import { HiSun, HiMoon, HiComputerDesktop } from "react-icons/hi2";
 import { showSuccessToast } from "@/lib/sync-toast";
 
 const THEMES = [
-  { value: "light", label: "Jasny" },
-  { value: "dark", label: "Ciemny" },
-  { value: "system", label: "Systemowy" },
+  { value: "light", label: "Jasny", icon: HiSun },
+  { value: "dark", label: "Ciemny", icon: HiMoon },
+  { value: "system", label: "Systemowy", icon: HiComputerDesktop },
 ] as const;
 
 export function ThemeSelector() {
@@ -39,9 +40,17 @@ export function ThemeSelector() {
       }}
       description="Wybierz jasny, ciemny lub tryb zgodny z ustawieniami systemu"
     >
-      {THEMES.map((t) => (
-        <SelectItem key={t.value}>{t.label}</SelectItem>
-      ))}
+      {THEMES.map((t) => {
+        const Icon = t.icon;
+        return (
+          <SelectItem
+            key={t.value}
+            startContent={<Icon className="text-lg" aria-hidden />}
+          >
+            {t.label}
+          </SelectItem>
+        );
+      })}
     </Select>
   );
 }

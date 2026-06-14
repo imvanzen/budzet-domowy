@@ -3,6 +3,7 @@
 import { useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Select, SelectItem } from "@heroui/select";
+import { HiCurrencyDollar } from "react-icons/hi2";
 import { changeCurrency } from "@/app/settings/actions";
 import { showSyncToast } from "@/lib/sync-toast";
 import type { Currency } from "@/db/schema";
@@ -55,6 +56,7 @@ export function CurrencySelector({ initialCurrency }: CurrencySelectorProps) {
       label="Waluta domyślna"
       selectedKeys={[optimisticCurrency]}
       onSelectionChange={handleCurrencyChange}
+      startContent={<HiCurrencyDollar className="text-success" aria-hidden />}
       description="Wybrana waluta będzie używana do formatowania wszystkich kwot w aplikacji"
     >
       {CURRENCIES.map((curr) => (

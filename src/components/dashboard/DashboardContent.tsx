@@ -1,18 +1,20 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
 import { Card, CardBody } from "@heroui/card";
+import { useEffect, useState, useTransition } from "react";
+import { type DashboardData, getDashboardData } from "@/app/actions";
 import {
-  SelectPeriod,
   type PeriodPreset,
+  SelectPeriod,
 } from "@/components/shared/SelectPeriod";
+import { DashboardChartsSkeleton } from "@/components/skeletons/DashboardChartsSkeleton";
+import { SummaryCardsSkeleton } from "@/components/skeletons/SummaryCardsSkeleton";
+import type { Currency } from "@/db/schema";
 import { getDateRangeFromPreset } from "@/lib/dateRange";
-import { SummaryCards } from "./SummaryCards";
+import { formatDateInput } from "@/lib/format";
 import { ExpensesPieChart } from "./ExpensesPieChart";
 import { IncomeExpenseBarChart } from "./IncomeExpenseBarChart";
-import { getDashboardData, type DashboardData } from "@/app/actions";
-import type { Currency } from "@/db/schema";
-import { formatDateInput } from "@/lib/format";
+import { SummaryCards } from "./SummaryCards";
 
 type DashboardContentProps = {
   initialData: DashboardData;
@@ -26,7 +28,7 @@ export function DashboardContent({
   const [preset, setPreset] = useState<PeriodPreset>("current-month");
   const now = new Date();
   const [dateFrom, setDateFrom] = useState(
-    formatDateInput(new Date(now.getFullYear(), now.getMonth(), 1))
+    formatDateInput(new Date(now.getFullYear(), now.getMonth(), 1)),
   );
   const [dateTo, setDateTo] = useState(formatDateInput(now));
   const [data, setData] = useState<DashboardData>(initialData);
@@ -38,7 +40,7 @@ export function DashboardContent({
         const { dateFrom: from, dateTo: to } = getDateRangeFromPreset(
           preset,
           dateFrom,
-          dateTo
+          dateTo,
         );
 
         const newData = await getDashboardData({
@@ -68,26 +70,32 @@ export function DashboardContent({
         </CardBody>
       </Card>
 
-      {isPending && (
-        <div className="text-center text-default-500">Ładowanie danych...</div>
-      )}
-
-      <div className={isPending ? "opacity-50" : ""}>
-        <SummaryCards
-          totalIncome={data.summary.totalIncome}
-          totalExpense={data.summary.totalExpense}
-          balance={data.summary.balance}
-          currency={currency}
-        />
-
-        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <ExpensesPieChart
-            data={data.expensesByCategory}
+      {isPending ? (
+        <>
+          <SummaryCardsSkeleton />
+          <DashboardChartsSkeleton />
+        </>
+      ) : (
+        <>
+          <SummaryCards
+            totalIncome={data.summary.totalIncome}
+            totalExpense={data.summary.totalExpense}
+            balance={data.summary.balance}
             currency={currency}
           />
-          <IncomeExpenseBarChart data={data.monthlyData} currency={currency} />
-        </div>
-      </div>
+
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <ExpensesPieChart
+              data={data.expensesByCategory}
+              currency={currency}
+            />
+            <IncomeExpenseBarChart
+              data={data.monthlyData}
+              currency={currency}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }

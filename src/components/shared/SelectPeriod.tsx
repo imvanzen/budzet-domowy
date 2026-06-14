@@ -2,6 +2,7 @@
 
 import { Select, SelectItem } from "@heroui/select";
 import { Input } from "@heroui/input";
+import { HiCalendarDays } from "react-icons/hi2";
 import type { PeriodPreset } from "@/lib/dateRange";
 
 export type { PeriodPreset };
@@ -37,6 +38,7 @@ export function SelectPeriod({
       <Select
         label="Wybór daty"
         selectedKeys={[preset]}
+        startContent={<HiCalendarDays className="text-default-400" aria-hidden />}
         onSelectionChange={(keys) => {
           const selected = Array.from(keys)[0] as PeriodPreset;
           onPresetChange(selected);

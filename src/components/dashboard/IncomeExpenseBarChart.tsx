@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardBody, CardHeader } from "@heroui/card";
+import { HiChartBar } from "react-icons/hi2";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { formatCurrency } from "@/lib/format";
 import type { Currency } from "@/db/schema";
@@ -15,11 +16,13 @@ export function IncomeExpenseBarChart({ data, currency }: IncomeExpenseBarChartP
   if (data.length === 0) {
     return (
       <Card>
-        <CardHeader>
+        <CardHeader className="flex items-center gap-2">
+          <HiChartBar className="text-xl text-primary" aria-hidden />
           <h3 className="text-lg font-semibold">Wpływy i Wydatki</h3>
         </CardHeader>
         <CardBody>
-          <div className="flex h-80 items-center justify-center">
+          <div className="flex h-80 flex-col items-center justify-center gap-2">
+            <HiChartBar className="text-4xl text-default-300" aria-hidden />
             <p className="text-center text-default-500">Brak danych do wyświetlenia</p>
           </div>
         </CardBody>
@@ -51,7 +54,8 @@ export function IncomeExpenseBarChart({ data, currency }: IncomeExpenseBarChartP
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex items-center gap-2">
+        <HiChartBar className="text-xl text-primary" aria-hidden />
         <h3 className="text-lg font-semibold">Wpływy i Wydatki</h3>
       </CardHeader>
       <CardBody>

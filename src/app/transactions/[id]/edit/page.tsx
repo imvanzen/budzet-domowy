@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
+import { HiArrowsRightLeft } from "react-icons/hi2";
 import { getCategories } from "@/services/categories";
 import { getTransaction } from "@/services/transactions";
 import { TransactionFormPage } from "@/components/transactions/TransactionFormPage";
@@ -20,7 +21,10 @@ async function EditTransactionContent({ id }: { id: string }) {
 
   return (
     <div className="container mx-auto max-w-6xl space-y-6 p-6">
-      <h1 className="text-3xl font-bold">Transakcje</h1>
+      <h1 className="flex items-center gap-3 text-3xl font-bold">
+        <HiArrowsRightLeft className="text-primary" aria-hidden />
+        Transakcje
+      </h1>
       <TransactionFormPage
         categories={categories}
         transaction={transaction}

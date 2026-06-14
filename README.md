@@ -6,12 +6,12 @@ Aplikacja webowa do zarządzania finansami osobistymi — rejestrowanie przychod
 
 ## Informacje o projekcie
 
-| | |
-|---|---|
-| **Autor** | Jakub Reczko |
-| **Nr albumu** | 09224 |
-| **E-mail** | jakub.reczko@edu.wsti.pl |
-| **Przedmiot** | Systemy Sieciowe |
+|               |                          |
+| ------------- | ------------------------ |
+| **Autor**     | Jakub Reczko             |
+| **Nr albumu** | 09224                    |
+| **E-mail**    | jakub.reczko@edu.wsti.pl |
+| **Przedmiot** | Systemy Sieciowe         |
 
 ## Funkcjonalności
 
@@ -24,12 +24,12 @@ Aplikacja webowa do zarządzania finansami osobistymi — rejestrowanie przychod
 
 ## Widoki aplikacji
 
-| Widok | Opis |
-|---|---|
-| **Dashboard** | Podsumowanie finansów z wykresami |
+| Widok          | Opis                                        |
+| -------------- | ------------------------------------------- |
+| **Dashboard**  | Podsumowanie finansów z wykresami           |
 | **Transakcje** | Lista transakcji z filtrowaniem i paginacją |
-| **Kategorie** | Tworzenie i edycja kategorii |
-| **Ustawienia** | Konfiguracja waluty i motywu |
+| **Kategorie**  | Tworzenie i edycja kategorii                |
+| **Ustawienia** | Konfiguracja waluty i motywu                |
 
 ## Stos technologiczny
 
@@ -38,6 +38,8 @@ Aplikacja webowa do zarządzania finansami osobistymi — rejestrowanie przychod
 - **HeroUI** + **Tailwind CSS 4**
 - **Recharts** — wykresy
 - **Vitest** + **Testing Library** — testy jednostkowe i integracyjne
+- **Oxlint** + **Oxfmt** — lint i formatowanie
+- **tsgo** (`@typescript/native-preview`) — sprawdzanie typów i kompilacja skryptów
 
 ## Uruchomienie
 
@@ -67,7 +69,9 @@ Aplikacja: [http://localhost:3000](http://localhost:3000)
 ```bash
 pnpm test        # tryb watch
 pnpm test:run    # jednorazowe uruchomienie
-pnpm lint        # Biome — lint i format
+pnpm lint        # Oxlint — lint
+pnpm format      # Oxfmt — formatowanie
+pnpm typecheck   # tsgo — sprawdzanie typów
 ```
 
 ## Struktura projektu

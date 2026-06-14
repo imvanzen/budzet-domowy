@@ -6,17 +6,9 @@ import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import { getSettings } from "@/services/settings";
 
 async function Dashboard() {
-  const [dashboardData, settings] = await Promise.all([
-    getDashboardData(),
-    getSettings(),
-  ]);
+  const [dashboardData, settings] = await Promise.all([getDashboardData(), getSettings()]);
 
-  return (
-    <DashboardContent
-      initialData={dashboardData}
-      currency={settings.currency}
-    />
-  );
+  return <DashboardContent initialData={dashboardData} currency={settings.currency} />;
 }
 
 export default function Home() {

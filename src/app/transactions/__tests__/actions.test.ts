@@ -91,9 +91,7 @@ describe("addTransaction server action", () => {
         updatedAt: new Date(),
       };
 
-      vi.mocked(transactionsService.createTransaction).mockResolvedValue(
-        mockTransaction as any
-      );
+      vi.mocked(transactionsService.createTransaction).mockResolvedValue(mockTransaction as any);
 
       const result = await addTransaction({
         amount: 100,
@@ -123,9 +121,7 @@ describe("addTransaction server action", () => {
         updatedAt: new Date(),
       };
 
-      vi.mocked(transactionsService.createTransaction).mockResolvedValue(
-        mockTransaction as any
-      );
+      vi.mocked(transactionsService.createTransaction).mockResolvedValue(mockTransaction as any);
 
       const result = await addTransaction({
         amount: 100.5,
@@ -160,9 +156,7 @@ describe("addTransaction server action", () => {
         updatedAt: new Date(),
       };
 
-      vi.mocked(transactionsService.createTransaction).mockResolvedValue(
-        mockTransaction as any
-      );
+      vi.mocked(transactionsService.createTransaction).mockResolvedValue(mockTransaction as any);
 
       const result = await addTransaction({
         amount: 50.0,
@@ -191,9 +185,7 @@ describe("addTransaction server action", () => {
         updatedAt: new Date(),
       };
 
-      vi.mocked(transactionsService.createTransaction).mockResolvedValue(
-        mockTransaction as any
-      );
+      vi.mocked(transactionsService.createTransaction).mockResolvedValue(mockTransaction as any);
 
       const result = await addTransaction({
         amount: 75.25,
@@ -210,7 +202,7 @@ describe("addTransaction server action", () => {
   describe("error handling", () => {
     it("should handle database errors gracefully", async () => {
       vi.mocked(transactionsService.createTransaction).mockRejectedValue(
-        new Error("Database error")
+        new Error("Database error"),
       );
 
       const result = await addTransaction({
@@ -285,13 +277,10 @@ describe("editTransaction server action", () => {
       });
 
       expect(result.success).toBe(true);
-      expect(transactionsService.updateTransaction).toHaveBeenCalledWith(
-        "test-id",
-        {
-          amount: 200,
-          description: "Updated",
-        }
-      );
+      expect(transactionsService.updateTransaction).toHaveBeenCalledWith("test-id", {
+        amount: 200,
+        description: "Updated",
+      });
     });
 
     it("should allow partial updates", async () => {
@@ -317,7 +306,7 @@ describe("editTransaction server action", () => {
   describe("error handling", () => {
     it("should handle database errors gracefully", async () => {
       vi.mocked(transactionsService.updateTransaction).mockRejectedValue(
-        new Error("Database error")
+        new Error("Database error"),
       );
 
       const result = await editTransaction("test-id", {
@@ -345,9 +334,7 @@ describe("removeTransaction server action", () => {
   });
 
   it("should handle database errors gracefully", async () => {
-    vi.mocked(transactionsService.deleteTransaction).mockRejectedValue(
-      new Error("Database error")
-    );
+    vi.mocked(transactionsService.deleteTransaction).mockRejectedValue(new Error("Database error"));
 
     const result = await removeTransaction("test-id");
 
@@ -355,5 +342,3 @@ describe("removeTransaction server action", () => {
     expect(result.error).toBe("Wystąpił błąd podczas usuwania transakcji");
   });
 });
-
-

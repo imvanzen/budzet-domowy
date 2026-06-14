@@ -53,8 +53,7 @@ function createRng(seed: number) {
   return {
     float: (min: number, max: number) => min + random() * (max - min),
     int: (min: number, max: number) => Math.floor(min + random() * (max - min + 1)),
-    amount: (min: number, max: number) =>
-      Math.round((min + random() * (max - min)) * 100) / 100,
+    amount: (min: number, max: number) => Math.round((min + random() * (max - min)) * 100) / 100,
     pick: <T>(items: T[]): T => items[Math.floor(random() * items.length)],
     chance: (probability: number) => random() < probability,
   };
@@ -128,11 +127,7 @@ function buildCategoryMap(existing: Category[]): CategoryMap {
   return map;
 }
 
-function resolveCategory(
-  map: CategoryMap,
-  role: CategoryRole,
-  fallback?: string,
-): string {
+function resolveCategory(map: CategoryMap, role: CategoryRole, fallback?: string): string {
   return map[role] ?? fallback ?? map.other ?? [...map.byId.keys()][0];
 }
 
@@ -203,11 +198,7 @@ function generateMonthTransactions(
       amount: rng.amount(800, 2500),
       type: "INCOME",
       date: monthDate(year, month, rng.int(5, 20)),
-      description: rng.pick([
-        "Freelance - projekt IT",
-        "Konsultacja",
-        "Zlecenie dodatkowe",
-      ]),
+      description: rng.pick(["Freelance - projekt IT", "Konsultacja", "Zlecenie dodatkowe"]),
       role: "salary",
     });
   }
@@ -515,9 +506,7 @@ async function main() {
   console.log("🎉 Seed completed (existing data preserved)!");
   console.log(`   Added transactions: ${allTransactions.length}`);
   console.log(`   Income: ${income} | Expense: ${expense}`);
-  console.log(
-    `   Avg per month: ${Math.round(allTransactions.length / 18)}`,
-  );
+  console.log(`   Avg per month: ${Math.round(allTransactions.length / 18)}`);
 
   process.exit(0);
 }

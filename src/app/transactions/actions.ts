@@ -39,7 +39,7 @@ function validateTransaction(input: {
 }
 
 export async function addTransaction(
-  input: Omit<NewTransaction, "id" | "createdAt" | "updatedAt">
+  input: Omit<NewTransaction, "id" | "createdAt" | "updatedAt">,
 ): Promise<ActionResult<{ id: string }>> {
   try {
     const error = validateTransaction(input);
@@ -65,7 +65,7 @@ export async function addTransaction(
 
 export async function editTransaction(
   id: string,
-  input: Partial<Omit<NewTransaction, "id" | "createdAt" | "updatedAt">>
+  input: Partial<Omit<NewTransaction, "id" | "createdAt" | "updatedAt">>,
 ): Promise<ActionResult> {
   try {
     const error = validateTransaction(input);
@@ -110,7 +110,7 @@ export async function removeTransaction(id: string): Promise<ActionResult> {
 export async function getFilteredTransactions(
   filters?: TransactionFilters,
   page = 1,
-  pageSize = DEFAULT_PAGE_SIZE
+  pageSize = DEFAULT_PAGE_SIZE,
 ): Promise<PaginatedResult<TransactionWithCategory>> {
   return getPaginatedTransactions(filters, page, pageSize);
 }

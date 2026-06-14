@@ -49,9 +49,7 @@ describe("useTransactionFiltersUrl", () => {
       to,
     });
 
-    const { result } = renderHook(() =>
-      useTransactionFiltersUrl({ categoryIds: ["cat-1"] }),
-    );
+    const { result } = renderHook(() => useTransactionFiltersUrl({ categoryIds: ["cat-1"] }));
 
     act(() => {
       result.current.setType("EXPENSE");
@@ -68,9 +66,7 @@ describe("useTransactionFiltersUrl", () => {
   it("should reset page when category filter changes", () => {
     currentSearchParams = new URLSearchParams({ page: "2" });
 
-    const { result } = renderHook(() =>
-      useTransactionFiltersUrl({ categoryIds: ["cat-1"] }),
-    );
+    const { result } = renderHook(() => useTransactionFiltersUrl({ categoryIds: ["cat-1"] }));
 
     act(() => {
       result.current.setCategoryId("cat-1");
@@ -93,9 +89,7 @@ describe("useTransactionFiltersUrl", () => {
       to,
     });
 
-    const { result } = renderHook(() =>
-      useTransactionFiltersUrl({ categoryIds: ["cat-1"] }),
-    );
+    const { result } = renderHook(() => useTransactionFiltersUrl({ categoryIds: ["cat-1"] }));
 
     mockReplace.mockClear();
 
@@ -120,9 +114,7 @@ describe("useTransactionFiltersUrl", () => {
   });
 
   it("should update page in url", () => {
-    const { result } = renderHook(() =>
-      useTransactionFiltersUrl({ categoryIds: ["cat-1"] }),
-    );
+    const { result } = renderHook(() => useTransactionFiltersUrl({ categoryIds: ["cat-1"] }));
 
     act(() => {
       result.current.setPage(3);
@@ -136,9 +128,7 @@ describe("useTransactionFiltersUrl", () => {
   it("should remove page param when set to 1", () => {
     currentSearchParams = new URLSearchParams({ page: "2", q: "kino" });
 
-    const { result } = renderHook(() =>
-      useTransactionFiltersUrl({ categoryIds: ["cat-1"] }),
-    );
+    const { result } = renderHook(() => useTransactionFiltersUrl({ categoryIds: ["cat-1"] }));
 
     act(() => {
       result.current.setPage(1);

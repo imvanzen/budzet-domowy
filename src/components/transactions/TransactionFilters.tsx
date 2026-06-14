@@ -4,11 +4,7 @@ import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 import type { DateValue } from "@internationalized/date";
 import type { RangeValue } from "@react-types/shared";
-import {
-  HiArrowTrendingDown,
-  HiArrowTrendingUp,
-  HiMagnifyingGlass,
-} from "react-icons/hi2";
+import { HiArrowTrendingDown, HiArrowTrendingUp, HiMagnifyingGlass } from "react-icons/hi2";
 import type { Category, TransactionType } from "@/db/schema";
 import { transactionType } from "@/db/schema";
 import type { TransactionPeriodPreset } from "@/lib/dateRange";
@@ -23,10 +19,7 @@ type TransactionFiltersProps = {
   searchPhrase?: string;
   onTypeChange: (type: TransactionType | "ALL") => void;
   onCategoryChange: (categoryId: string | "ALL") => void;
-  onDateFilterChange: (
-    preset: TransactionPeriodPreset,
-    range: RangeValue<DateValue>,
-  ) => void;
+  onDateFilterChange: (preset: TransactionPeriodPreset, range: RangeValue<DateValue>) => void;
   onSearchChange: (phrase: string) => void;
 };
 
@@ -52,9 +45,7 @@ export function TransactionFilters({
         aria-label="Szukaj"
         isClearable
         onClear={() => onSearchChange("")}
-        startContent={
-          <HiMagnifyingGlass className="text-default-400" aria-hidden />
-        }
+        startContent={<HiMagnifyingGlass className="text-default-400" aria-hidden />}
       />
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -70,17 +61,13 @@ export function TransactionFilters({
           <SelectItem key="ALL">Wszystkie</SelectItem>
           <SelectItem
             key={transactionType.INCOME}
-            startContent={
-              <HiArrowTrendingUp className="text-success" aria-hidden />
-            }
+            startContent={<HiArrowTrendingUp className="text-success" aria-hidden />}
           >
             Przychód
           </SelectItem>
           <SelectItem
             key={transactionType.EXPENSE}
-            startContent={
-              <HiArrowTrendingDown className="text-danger" aria-hidden />
-            }
+            startContent={<HiArrowTrendingDown className="text-danger" aria-hidden />}
           >
             Wydatek
           </SelectItem>

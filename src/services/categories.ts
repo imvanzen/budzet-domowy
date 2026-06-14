@@ -16,7 +16,7 @@ export async function getCategory(id: string): Promise<Category | undefined> {
 }
 
 export async function createCategory(
-  input: Omit<NewCategory, "id" | "createdAt" | "updatedAt">
+  input: Omit<NewCategory, "id" | "createdAt" | "updatedAt">,
 ): Promise<Category> {
   const [category] = await db
     .insert(categories)
@@ -31,7 +31,7 @@ export async function createCategory(
 
 export async function updateCategory(
   id: string,
-  input: Partial<Omit<NewCategory, "id" | "createdAt" | "updatedAt">>
+  input: Partial<Omit<NewCategory, "id" | "createdAt" | "updatedAt">>,
 ): Promise<Category> {
   const [category] = await db
     .update(categories)

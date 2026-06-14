@@ -23,9 +23,7 @@ export function useTestDb() {
   return {
     get db() {
       if (!db) {
-        throw new Error(
-          "Database not initialized. Make sure to call useTestDb() before using db."
-        );
+        throw new Error("Database not initialized. Make sure to call useTestDb() before using db.");
       }
       return db;
     },

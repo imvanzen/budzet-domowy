@@ -7,20 +7,14 @@ import { Chip, Pagination } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { HiClipboardDocumentList, HiPlus } from "react-icons/hi2";
-import {
-  addTransaction,
-  getFilteredTransactions,
-} from "@/app/transactions/actions";
+import { addTransaction, getFilteredTransactions } from "@/app/transactions/actions";
 import { TransactionListSkeleton } from "@/components/skeletons/TransactionListSkeleton";
 import type { Category, Currency } from "@/db/schema";
 import { useTransactionFiltersUrl } from "@/hooks/use-transaction-filters-url";
 import { consumePendingTransaction } from "@/lib/pending-transaction";
 import { showSyncToast } from "@/lib/sync-toast";
 import { buildTransactionFiltersFromUrlState } from "@/lib/transaction-filters-url";
-import type {
-  PaginatedResult,
-  TransactionWithCategory,
-} from "@/services/transactions";
+import type { PaginatedResult, TransactionWithCategory } from "@/services/transactions";
 import { TransactionFilters } from "./TransactionFilters";
 import { TransactionList } from "./TransactionList";
 
@@ -36,10 +30,7 @@ export function TransactionsManager({
   currency,
 }: TransactionsManagerProps) {
   const router = useRouter();
-  const categoryIds = useMemo(
-    () => categories.map((category) => category.id),
-    [categories],
-  );
+  const categoryIds = useMemo(() => categories.map((category) => category.id), [categories]);
 
   const {
     selectedType,
@@ -136,14 +127,7 @@ export function TransactionsManager({
         });
       }
     });
-  }, [
-    router,
-    selectedType,
-    selectedCategoryId,
-    dateRange,
-    debouncedSearchPhrase,
-    setPage,
-  ]);
+  }, [router, selectedType, selectedCategoryId, dateRange, debouncedSearchPhrase, setPage]);
 
   useEffect(() => {
     const fetchFilteredTransactions = () => {
@@ -161,23 +145,14 @@ export function TransactionsManager({
     };
 
     fetchFilteredTransactions();
-  }, [
-    selectedType,
-    selectedCategoryId,
-    dateRange,
-    debouncedSearchPhrase,
-    page,
-  ]);
+  }, [selectedType, selectedCategoryId, dateRange, debouncedSearchPhrase, page]);
 
   return (
     <Card>
       <CardHeader>
         <div className="flex w-full items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <HiClipboardDocumentList
-              className="text-xl text-primary"
-              aria-hidden
-            />
+            <HiClipboardDocumentList className="text-xl text-primary" aria-hidden />
             <h2 className="text-xl font-semibold">Lista transakcji</h2>
             <Chip color="primary" size="sm" variant="solid">
               {data.total}

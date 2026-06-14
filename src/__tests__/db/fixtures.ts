@@ -1,11 +1,5 @@
 import type { NewCategory, NewTransaction, NewSettings } from "@/db/schema";
-import {
-  transactionType,
-  currency,
-  categories,
-  transactions,
-  settings,
-} from "@/db/schema";
+import { transactionType, currency, categories, transactions, settings } from "@/db/schema";
 
 export const testCategories: NewCategory[] = [
   {
@@ -57,9 +51,7 @@ export const testSettings: NewSettings = {
 import type { LibSQLDatabase } from "drizzle-orm/libsql";
 import type * as schema from "@/db/schema";
 
-export async function seedTestDb(
-  db: LibSQLDatabase<typeof schema>
-) {
+export async function seedTestDb(db: LibSQLDatabase<typeof schema>) {
   await db.insert(categories).values(testCategories);
   await db.insert(transactions).values(testTransactions);
   await db.insert(settings).values(testSettings);

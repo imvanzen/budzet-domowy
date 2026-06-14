@@ -6,7 +6,7 @@ import type { NewCategory } from "@/db/schema";
 import type { ActionResult } from "@/types/actions";
 
 export async function addCategory(
-  input: Omit<NewCategory, "id" | "createdAt" | "updatedAt">
+  input: Omit<NewCategory, "id" | "createdAt" | "updatedAt">,
 ): Promise<ActionResult<{ id: string }>> {
   try {
     if (!input.name || input.name.trim().length === 0) {
@@ -32,7 +32,7 @@ export async function addCategory(
 
 export async function editCategory(
   id: string,
-  input: Partial<Omit<NewCategory, "id" | "createdAt" | "updatedAt">>
+  input: Partial<Omit<NewCategory, "id" | "createdAt" | "updatedAt">>,
 ): Promise<ActionResult> {
   try {
     if (input.name !== undefined) {
@@ -76,4 +76,3 @@ export async function removeCategory(id: string): Promise<ActionResult> {
     };
   }
 }
-

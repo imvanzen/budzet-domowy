@@ -16,8 +16,7 @@ export type TransactionPeriodPreset =
   | "previous-year"
   | "custom";
 
-export const DEFAULT_TRANSACTION_PERIOD_PRESET: TransactionPeriodPreset =
-  "current-year";
+export const DEFAULT_TRANSACTION_PERIOD_PRESET: TransactionPeriodPreset = "current-year";
 
 export const TRANSACTION_PERIOD_PRESETS: Array<{
   value: TransactionPeriodPreset;
@@ -35,15 +34,7 @@ export function startOfDay(date: Date): Date {
 }
 
 export function endOfDay(date: Date): Date {
-  return new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate(),
-    23,
-    59,
-    59,
-    999,
-  );
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
 }
 
 function parseDateInput(value: string): Date {
@@ -67,28 +58,20 @@ export function getDateRangeFromPreset(
       return { dateFrom: start, dateTo: todayEnd };
     }
     case "previous-month": {
-      const start = startOfDay(
-        new Date(now.getFullYear(), now.getMonth() - 1, 1),
-      );
+      const start = startOfDay(new Date(now.getFullYear(), now.getMonth() - 1, 1));
       const end = endOfDay(new Date(now.getFullYear(), now.getMonth(), 0));
       return { dateFrom: start, dateTo: end };
     }
     case "last-3-months": {
-      const start = startOfDay(
-        new Date(now.getFullYear(), now.getMonth() - 2, 1),
-      );
+      const start = startOfDay(new Date(now.getFullYear(), now.getMonth() - 2, 1));
       return { dateFrom: start, dateTo: todayEnd };
     }
     case "last-6-months": {
-      const start = startOfDay(
-        new Date(now.getFullYear(), now.getMonth() - 5, 1),
-      );
+      const start = startOfDay(new Date(now.getFullYear(), now.getMonth() - 5, 1));
       return { dateFrom: start, dateTo: todayEnd };
     }
     case "last-12-months": {
-      const start = startOfDay(
-        new Date(now.getFullYear(), now.getMonth() - 11, 1),
-      );
+      const start = startOfDay(new Date(now.getFullYear(), now.getMonth() - 11, 1));
       return { dateFrom: start, dateTo: todayEnd };
     }
     case "custom": {
@@ -123,9 +106,7 @@ export function getTransactionDateRangeFromPreset(
       return { dateFrom: start, dateTo: todayEnd };
     }
     case "previous-month": {
-      const start = startOfDay(
-        new Date(now.getFullYear(), now.getMonth() - 1, 1),
-      );
+      const start = startOfDay(new Date(now.getFullYear(), now.getMonth() - 1, 1));
       const end = endOfDay(new Date(now.getFullYear(), now.getMonth(), 0));
       return { dateFrom: start, dateTo: end };
     }
@@ -160,9 +141,7 @@ export function getCalendarRangeFromTransactionPreset(
 
   const { dateFrom, dateTo } = getTransactionDateRangeFromPreset(
     preset,
-    customRange?.start
-      ? formatCalendarDateParam(customRange.start)
-      : undefined,
+    customRange?.start ? formatCalendarDateParam(customRange.start) : undefined,
     customRange?.end ? formatCalendarDateParam(customRange.end) : undefined,
     referenceDate,
   );
@@ -192,11 +171,7 @@ export function detectTransactionPeriodPreset(
   for (const preset of TRANSACTION_PERIOD_PRESETS) {
     if (preset.value === "custom") continue;
 
-    const presetRange = getCalendarRangeFromTransactionPreset(
-      preset.value,
-      null,
-      referenceDate,
-    );
+    const presetRange = getCalendarRangeFromTransactionPreset(preset.value, null, referenceDate);
     const presetKey = `${formatCalendarDateParam(presetRange.start)}:${formatCalendarDateParam(presetRange.end)}`;
 
     if (rangeKey === presetKey) {
@@ -207,9 +182,7 @@ export function detectTransactionPeriodPreset(
   return "custom";
 }
 
-export function validateTransactionDateRange(
-  value: RangeValue<DateValue> | null
-): string | null {
+export function validateTransactionDateRange(value: RangeValue<DateValue> | null): string | null {
   if (!value?.start || !value?.end) {
     return null;
   }
@@ -227,15 +200,12 @@ export function validateTransactionDateRange(
   return null;
 }
 
-export function calendarDateRangeToDates(
-  value: RangeValue<DateValue>
-): { dateFrom: Date; dateTo: Date } {
-  const dateFrom = startOfDay(
-    new Date(value.start.year, value.start.month - 1, value.start.day),
-  );
-  const dateTo = endOfDay(
-    new Date(value.end.year, value.end.month - 1, value.end.day),
-  );
+export function calendarDateRangeToDates(value: RangeValue<DateValue>): {
+  dateFrom: Date;
+  dateTo: Date;
+} {
+  const dateFrom = startOfDay(new Date(value.start.year, value.start.month - 1, value.start.day));
+  const dateTo = endOfDay(new Date(value.end.year, value.end.month - 1, value.end.day));
 
   return { dateFrom, dateTo };
 }
@@ -249,9 +219,5 @@ export function calendarDateToDate(value: DateValue): Date {
 }
 
 export function dateToCalendarDate(date: Date): DateValue {
-  return new CalendarDate(
-    date.getFullYear(),
-    date.getMonth() + 1,
-    date.getDate(),
-  );
+  return new CalendarDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
 }

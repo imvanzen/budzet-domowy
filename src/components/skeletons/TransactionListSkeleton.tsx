@@ -6,9 +6,7 @@ type TransactionListSkeletonProps = {
   rows?: number;
 };
 
-export function TransactionListSkeleton({
-  rows = 5,
-}: TransactionListSkeletonProps) {
+export function TransactionListSkeleton({ rows = 5 }: TransactionListSkeletonProps) {
   const rowKeys = DEFAULT_ROW_KEYS.slice(0, rows);
 
   return (

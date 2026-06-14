@@ -102,13 +102,14 @@ describe("TransactionsManager", () => {
           initialData={mockInitialData}
           categories={mockCategories}
           currency="PLN"
-        />
+        />,
       );
 
       expect(screen.getByText("Lista transakcji")).toBeInTheDocument();
-      expect(
-        screen.getByRole("link", { name: /dodaj transakcję/i })
-      ).toHaveAttribute("href", "/transactions/new");
+      expect(screen.getByRole("link", { name: /dodaj transakcję/i })).toHaveAttribute(
+        "href",
+        "/transactions/new",
+      );
     });
 
     it("should render filters", () => {
@@ -117,7 +118,7 @@ describe("TransactionsManager", () => {
           initialData={mockInitialData}
           categories={mockCategories}
           currency="PLN"
-        />
+        />,
       );
 
       expect(screen.getAllByLabelText("Typ transakcji")[0]).toBeInTheDocument();
@@ -132,7 +133,7 @@ describe("TransactionsManager", () => {
           initialData={mockInitialData}
           categories={mockCategories}
           currency="PLN"
-        />
+        />,
       );
 
       expect(screen.getByText("3")).toBeInTheDocument();
@@ -146,7 +147,7 @@ describe("TransactionsManager", () => {
           initialData={mockInitialData}
           categories={mockCategories}
           currency="PLN"
-        />
+        />,
       );
 
       await waitFor(() => {
@@ -169,7 +170,7 @@ describe("TransactionsManager", () => {
           initialData={mockInitialData}
           categories={mockCategories}
           currency="PLN"
-        />
+        />,
       );
 
       await waitFor(() => {
@@ -181,7 +182,7 @@ describe("TransactionsManager", () => {
           initialData={filteredData}
           categories={mockCategories}
           currency="PLN"
-        />
+        />,
       );
 
       await waitFor(() => {
@@ -207,12 +208,10 @@ describe("TransactionsManager", () => {
           initialData={paginatedData}
           categories={mockCategories}
           currency="PLN"
-        />
+        />,
       );
 
-      expect(
-        screen.getByRole("navigation", { name: /paginacja transakcji/i })
-      ).toBeInTheDocument();
+      expect(screen.getByRole("navigation", { name: /paginacja transakcji/i })).toBeInTheDocument();
     });
 
     it("should not render pagination for a single page", () => {
@@ -221,11 +220,11 @@ describe("TransactionsManager", () => {
           initialData={mockInitialData}
           categories={mockCategories}
           currency="PLN"
-        />
+        />,
       );
 
       expect(
-        screen.queryByRole("navigation", { name: /paginacja transakcji/i })
+        screen.queryByRole("navigation", { name: /paginacja transakcji/i }),
       ).not.toBeInTheDocument();
     });
   });

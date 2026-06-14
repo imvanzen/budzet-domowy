@@ -13,11 +13,7 @@ interface CategoryFormProps {
   onCancel?: () => void;
 }
 
-export function CategoryForm({
-  category,
-  onSuccess,
-  onCancel,
-}: CategoryFormProps) {
+export function CategoryForm({ category, onSuccess, onCancel }: CategoryFormProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -76,17 +72,11 @@ export function CategoryForm({
         description={`${name.length}/100 znaków`}
       />
 
-      {error && (
-        <div className="rounded-lg bg-danger-50 p-3 text-sm text-danger">
-          {error}
-        </div>
-      )}
+      {error && <div className="rounded-lg bg-danger-50 p-3 text-sm text-danger">{error}</div>}
 
       {success && (
         <div className="rounded-lg bg-success-50 p-3 text-sm text-success">
-          {isEditMode
-            ? "Kategoria została zaktualizowana!"
-            : "Kategoria została dodana pomyślnie!"}
+          {isEditMode ? "Kategoria została zaktualizowana!" : "Kategoria została dodana pomyślnie!"}
         </div>
       )}
 
@@ -107,13 +97,7 @@ export function CategoryForm({
           isLoading={isPending}
           className={isEditMode ? "flex-1" : "w-full"}
           startContent={
-            !isPending ? (
-              isEditMode ? (
-                <HiCheck aria-hidden />
-              ) : (
-                <HiPlus aria-hidden />
-              )
-            ) : undefined
+            !isPending ? isEditMode ? <HiCheck aria-hidden /> : <HiPlus aria-hidden /> : undefined
           }
         >
           {isPending
@@ -121,8 +105,8 @@ export function CategoryForm({
               ? "Zapisywanie..."
               : "Dodawanie..."
             : isEditMode
-            ? "Zapisz"
-            : "Dodaj Kategorię"}
+              ? "Zapisz"
+              : "Dodaj Kategorię"}
         </Button>
       </div>
     </form>

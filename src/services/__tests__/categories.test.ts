@@ -87,10 +87,7 @@ describe("Categories Service Logic", () => {
       expect(newCategory.updatedAt).toBeInstanceOf(Date);
 
       // Verify it exists in database
-      const [found] = await db
-        .select()
-        .from(categories)
-        .where(eq(categories.id, newCategory.id));
+      const [found] = await db.select().from(categories).where(eq(categories.id, newCategory.id));
 
       expect(found).toBeDefined();
       expect(found?.name).toBe("Test Category");
@@ -131,7 +128,7 @@ describe("Categories Service Logic", () => {
         expect(updated.id).toBe(categoryToUpdate.id);
         expect(updated.name).toBe("Updated Name");
         expect(updated.updatedAt.getTime()).toBeGreaterThanOrEqual(
-          categoryToUpdate.updatedAt.getTime()
+          categoryToUpdate.updatedAt.getTime(),
         );
 
         // Verify in database
@@ -182,10 +179,7 @@ describe("Categories Service Logic", () => {
       await db.delete(categories).where(eq(categories.id, newCategory.id));
 
       // Verify it's deleted
-      const [found] = await db
-        .select()
-        .from(categories)
-        .where(eq(categories.id, newCategory.id));
+      const [found] = await db.select().from(categories).where(eq(categories.id, newCategory.id));
 
       expect(found).toBeUndefined();
     });
@@ -194,7 +188,7 @@ describe("Categories Service Logic", () => {
       const { db } = testDb;
 
       await expect(
-        db.delete(categories).where(eq(categories.id, "non-existent-id"))
+        db.delete(categories).where(eq(categories.id, "non-existent-id")),
       ).resolves.not.toThrow();
     });
   });

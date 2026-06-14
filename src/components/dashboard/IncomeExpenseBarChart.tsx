@@ -2,7 +2,16 @@
 
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { HiChartBar } from "react-icons/hi2";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import { formatCurrency } from "@/lib/format";
 import type { Currency } from "@/db/schema";
 import type { MonthlyData } from "@/services/transactions";

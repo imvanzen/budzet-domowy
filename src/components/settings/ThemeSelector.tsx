@@ -43,10 +43,7 @@ export function ThemeSelector() {
       {THEMES.map((t) => {
         const Icon = t.icon;
         return (
-          <SelectItem
-            key={t.value}
-            startContent={<Icon className="text-lg" aria-hidden />}
-          >
+          <SelectItem key={t.value} startContent={<Icon className="text-lg" aria-hidden />}>
             {t.label}
           </SelectItem>
         );

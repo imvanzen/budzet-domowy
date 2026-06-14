@@ -51,21 +51,10 @@ export function SelectPeriod({
 
       {preset === "custom" && (
         <div className="grid grid-cols-2 gap-4">
-          <Input
-            type="date"
-            label="Od"
-            value={dateFrom}
-            onValueChange={onDateFromChange}
-          />
-          <Input
-            type="date"
-            label="Do"
-            value={dateTo}
-            onValueChange={onDateToChange}
-          />
+          <Input type="date" label="Od" value={dateFrom} onValueChange={onDateFromChange} />
+          <Input type="date" label="Do" value={dateTo} onValueChange={onDateToChange} />
         </div>
       )}
     </div>
   );
 }
-

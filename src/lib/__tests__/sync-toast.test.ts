@@ -16,14 +16,11 @@ describe("sync-toast", () => {
   });
 
   it("should show loading then success toast", async () => {
-    await showSyncToast(
-      async () => "ok",
-      {
-        loading: "Loading...",
-        success: "Done",
-        error: "Failed",
-      },
-    );
+    await showSyncToast(async () => "ok", {
+      loading: "Loading...",
+      success: "Done",
+      error: "Failed",
+    });
 
     expect(mockAddToast).toHaveBeenCalledWith(
       expect.objectContaining({

@@ -16,7 +16,10 @@ describe("validateTransactionDateRange", () => {
   it("should return null for empty range", () => {
     expect(validateTransactionDateRange(null)).toBeNull();
     expect(
-      validateTransactionDateRange({ start: parseDate("2024-01-01"), end: parseDate("2024-01-01") })
+      validateTransactionDateRange({
+        start: parseDate("2024-01-01"),
+        end: parseDate("2024-01-01"),
+      }),
     ).toBeNull();
   });
 
@@ -24,9 +27,9 @@ describe("validateTransactionDateRange", () => {
     const futureStart = parseDate("2099-01-01");
     const futureEnd = parseDate("2099-01-31");
 
-    expect(
-      validateTransactionDateRange({ start: futureStart, end: futureEnd })
-    ).toBe("Data nie może być z przyszłości");
+    expect(validateTransactionDateRange({ start: futureStart, end: futureEnd })).toBe(
+      "Data nie może być z przyszłości",
+    );
   });
 
   it("should reject start date after end date", () => {
@@ -34,7 +37,7 @@ describe("validateTransactionDateRange", () => {
       validateTransactionDateRange({
         start: parseDate("2024-06-15"),
         end: parseDate("2024-06-01"),
-      })
+      }),
     ).toBe("Data początkowa nie może być późniejsza niż data końcowa");
   });
 
@@ -43,7 +46,7 @@ describe("validateTransactionDateRange", () => {
       validateTransactionDateRange({
         start: parseDate("2024-01-01"),
         end: parseDate("2024-01-31"),
-      })
+      }),
     ).toBeNull();
   });
 });
@@ -70,9 +73,7 @@ describe("getDateRangeFromPreset", () => {
     expect(last3Months.dateTo).toEqual(new Date(2026, 5, 13, 23, 59, 59, 999));
 
     expect(currentMonth.dateTo.getTime()).toBe(last3Months.dateTo.getTime());
-    expect(currentMonth.dateFrom.getTime()).toBeGreaterThan(
-      last3Months.dateFrom.getTime(),
-    );
+    expect(currentMonth.dateFrom.getTime()).toBeGreaterThan(last3Months.dateFrom.getTime());
   });
 
   it("should use full previous calendar month", () => {
@@ -125,15 +126,9 @@ describe("transaction period presets", () => {
   });
 
   it("should detect matching preset from calendar range", () => {
-    const range = getCalendarRangeFromTransactionPreset(
-      "current-month",
-      null,
-      REFERENCE_DATE,
-    );
+    const range = getCalendarRangeFromTransactionPreset("current-month", null, REFERENCE_DATE);
 
-    expect(detectTransactionPeriodPreset(range, REFERENCE_DATE)).toBe(
-      "current-month",
-    );
+    expect(detectTransactionPeriodPreset(range, REFERENCE_DATE)).toBe("current-month");
     expect(
       detectTransactionPeriodPreset(
         { start: parseDate("2026-02-10"), end: parseDate("2026-03-05") },

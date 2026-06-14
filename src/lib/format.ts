@@ -1,9 +1,6 @@
 import type { Currency } from "@/db/schema";
 
-export function formatCurrency(
-  amount: number,
-  currency: Currency = "PLN"
-): string {
+export function formatCurrency(amount: number, currency: Currency = "PLN"): string {
   const formatter = new Intl.NumberFormat("pl-PL", {
     style: "currency",
     currency,

@@ -1,9 +1,5 @@
 import { Card, CardBody } from "@heroui/card";
-import {
-  HiArrowTrendingUp,
-  HiArrowTrendingDown,
-  HiScale,
-} from "react-icons/hi2";
+import { HiArrowTrendingUp, HiArrowTrendingDown, HiScale } from "react-icons/hi2";
 import { formatCurrency } from "@/lib/format";
 import type { Currency } from "@/db/schema";
 
@@ -14,12 +10,7 @@ type SummaryCardsProps = {
   currency: Currency;
 };
 
-export function SummaryCards({
-  totalIncome,
-  totalExpense,
-  balance,
-  currency,
-}: SummaryCardsProps) {
+export function SummaryCards({ totalIncome, totalExpense, balance, currency }: SummaryCardsProps) {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
       <Card>
@@ -67,9 +58,7 @@ export function SummaryCards({
           <div>
             <p className="text-sm text-default-500">Balans</p>
             <p
-              className={`mt-1 text-2xl font-bold ${
-                balance >= 0 ? "text-success" : "text-danger"
-              }`}
+              className={`mt-1 text-2xl font-bold ${balance >= 0 ? "text-success" : "text-danger"}`}
             >
               {formatCurrency(balance, currency)}
             </p>
@@ -79,4 +68,3 @@ export function SummaryCards({
     </div>
   );
 }
-

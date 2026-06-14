@@ -3,21 +3,13 @@
 import { Navbar as HeroNavbar, NavbarBrand, NavbarContent, NavbarItem } from "@heroui/navbar";
 import { Link } from "@heroui/link";
 import { usePathname } from "next/navigation";
-import {
-  HiHome,
-  HiArrowsRightLeft,
-  HiTag,
-  HiCog6Tooth,
-  HiWallet,
-} from "react-icons/hi2";
+import { HiHome, HiArrowsRightLeft, HiTag, HiCog6Tooth, HiWallet } from "react-icons/hi2";
 
 export function Navbar() {
   const pathname = usePathname();
 
   const isActive = (path: string) =>
-    path === "/"
-      ? pathname === path
-      : pathname === path || pathname.startsWith(`${path}/`);
+    path === "/" ? pathname === path : pathname === path || pathname.startsWith(`${path}/`);
 
   return (
     <HeroNavbar isBordered>
@@ -73,4 +65,3 @@ export function Navbar() {
     </HeroNavbar>
   );
 }
-

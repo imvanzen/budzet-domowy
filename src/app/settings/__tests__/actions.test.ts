@@ -24,9 +24,7 @@ describe("Settings Actions", () => {
         currency: "PLN" as const,
       };
 
-      vi.mocked(settingsService.updateSettings).mockResolvedValue(
-        mockSettings as any
-      );
+      vi.mocked(settingsService.updateSettings).mockResolvedValue(mockSettings as any);
 
       const result = await changeCurrency("PLN");
 
@@ -40,9 +38,7 @@ describe("Settings Actions", () => {
         currency: "EUR" as const,
       };
 
-      vi.mocked(settingsService.updateSettings).mockResolvedValue(
-        mockSettings as any
-      );
+      vi.mocked(settingsService.updateSettings).mockResolvedValue(mockSettings as any);
 
       const result = await changeCurrency("EUR");
 
@@ -56,9 +52,7 @@ describe("Settings Actions", () => {
         currency: "USD" as const,
       };
 
-      vi.mocked(settingsService.updateSettings).mockResolvedValue(
-        mockSettings as any
-      );
+      vi.mocked(settingsService.updateSettings).mockResolvedValue(mockSettings as any);
 
       const result = await changeCurrency("USD");
 
@@ -67,9 +61,7 @@ describe("Settings Actions", () => {
     });
 
     it("should handle database errors gracefully", async () => {
-      vi.mocked(settingsService.updateSettings).mockRejectedValue(
-        new Error("Database error")
-      );
+      vi.mocked(settingsService.updateSettings).mockRejectedValue(new Error("Database error"));
 
       const result = await changeCurrency("PLN");
 
@@ -78,5 +70,3 @@ describe("Settings Actions", () => {
     });
   });
 });
-
-

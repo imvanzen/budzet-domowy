@@ -28,9 +28,7 @@ export function ConfirmModal({
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
-          {isDanger && (
-            <HiExclamationTriangle className="text-xl text-danger" aria-hidden />
-          )}
+          {isDanger && <HiExclamationTriangle className="text-xl text-danger" aria-hidden />}
           {title}
         </ModalHeader>
         <ModalBody>
@@ -48,4 +46,3 @@ export function ConfirmModal({
     </Modal>
   );
 }
-

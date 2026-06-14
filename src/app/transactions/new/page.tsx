@@ -12,10 +12,7 @@ async function NewTransactionContent() {
         <HiArrowsRightLeft className="text-primary" aria-hidden />
         Transakcje
       </h1>
-      <TransactionFormPage
-        categories={categories}
-        title="Dodaj transakcję"
-      />
+      <TransactionFormPage categories={categories} title="Dodaj transakcję" />
     </div>
   );
 }

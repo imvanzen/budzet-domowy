@@ -123,9 +123,7 @@ describe("Transactions Service Logic", () => {
       });
 
       result.forEach((t) => {
-        expect(new Date(t.date).getTime()).toBeGreaterThanOrEqual(
-          dateFrom.getTime()
-        );
+        expect(new Date(t.date).getTime()).toBeGreaterThanOrEqual(dateFrom.getTime());
       });
     });
 
@@ -139,9 +137,7 @@ describe("Transactions Service Logic", () => {
       });
 
       result.forEach((t) => {
-        expect(new Date(t.date).getTime()).toBeLessThanOrEqual(
-          dateTo.getTime()
-        );
+        expect(new Date(t.date).getTime()).toBeLessThanOrEqual(dateTo.getTime());
       });
     });
 
@@ -167,7 +163,7 @@ describe("Transactions Service Logic", () => {
         where: and(
           gte(transactions.date, dateFrom),
           lte(transactions.date, dateTo),
-          eq(transactions.type, transactionType.EXPENSE)
+          eq(transactions.type, transactionType.EXPENSE),
         ),
         orderBy: [desc(transactions.date)],
       });
@@ -280,16 +276,19 @@ describe("Transactions Service Logic", () => {
 
       const expenses = allTransactions.filter((t) => t.type === "EXPENSE");
 
-      const grouped = expenses.reduce((acc, t) => {
-        const key = t.categoryId || "null";
-        const name = t.category?.name || "Bez kategorii";
+      const grouped = expenses.reduce(
+        (acc, t) => {
+          const key = t.categoryId || "null";
+          const name = t.category?.name || "Bez kategorii";
 
-        if (!acc[key]) {
-          acc[key] = { categoryId: t.categoryId, categoryName: name, total: 0 };
-        }
-        acc[key].total += t.amount;
-        return acc;
-      }, {} as Record<string, { categoryId: string | null; categoryName: string; total: number }>);
+          if (!acc[key]) {
+            acc[key] = { categoryId: t.categoryId, categoryName: name, total: 0 };
+          }
+          acc[key].total += t.amount;
+          return acc;
+        },
+        {} as Record<string, { categoryId: string | null; categoryName: string; total: number }>,
+      );
 
       const result = Object.values(grouped);
 
@@ -318,16 +317,19 @@ describe("Transactions Service Logic", () => {
 
       const expenses = allTransactions.filter((t) => t.type === "EXPENSE");
 
-      const grouped = expenses.reduce((acc, t) => {
-        const key = t.categoryId || "null";
-        const name = t.category?.name || "Bez kategorii";
+      const grouped = expenses.reduce(
+        (acc, t) => {
+          const key = t.categoryId || "null";
+          const name = t.category?.name || "Bez kategorii";
 
-        if (!acc[key]) {
-          acc[key] = { categoryId: t.categoryId, categoryName: name, total: 0 };
-        }
-        acc[key].total += t.amount;
-        return acc;
-      }, {} as Record<string, { categoryId: string | null; categoryName: string; total: number }>);
+          if (!acc[key]) {
+            acc[key] = { categoryId: t.categoryId, categoryName: name, total: 0 };
+          }
+          acc[key].total += t.amount;
+          return acc;
+        },
+        {} as Record<string, { categoryId: string | null; categoryName: string; total: number }>,
+      );
 
       const result = Object.values(grouped);
       const uncategorized = result.find((r) => r.categoryId === null);
@@ -363,28 +365,27 @@ describe("Transactions Service Logic", () => {
 
       const allTransactions = await db.query.transactions.findMany();
 
-      const grouped = allTransactions.reduce((acc, t) => {
-        const date = new Date(t.date);
-        const monthKey = `${date.getFullYear()}-${String(
-          date.getMonth() + 1
-        ).padStart(2, "0")}`;
+      const grouped = allTransactions.reduce(
+        (acc, t) => {
+          const date = new Date(t.date);
+          const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 
-        if (!acc[monthKey]) {
-          acc[monthKey] = { month: monthKey, income: 0, expense: 0 };
-        }
+          if (!acc[monthKey]) {
+            acc[monthKey] = { month: monthKey, income: 0, expense: 0 };
+          }
 
-        if (t.type === "INCOME") {
-          acc[monthKey].income += t.amount;
-        } else {
-          acc[monthKey].expense += t.amount;
-        }
+          if (t.type === "INCOME") {
+            acc[monthKey].income += t.amount;
+          } else {
+            acc[monthKey].expense += t.amount;
+          }
 
-        return acc;
-      }, {} as Record<string, { month: string; income: number; expense: number }>);
-
-      const result = Object.values(grouped).sort((a, b) =>
-        a.month.localeCompare(b.month)
+          return acc;
+        },
+        {} as Record<string, { month: string; income: number; expense: number }>,
       );
+
+      const result = Object.values(grouped).sort((a, b) => a.month.localeCompare(b.month));
 
       expect(result.length).toBeGreaterThan(0);
       const jan2024 = result.find((r) => r.month === "2024-01");
@@ -399,28 +400,27 @@ describe("Transactions Service Logic", () => {
 
       const allTransactions = await db.query.transactions.findMany();
 
-      const grouped = allTransactions.reduce((acc, t) => {
-        const date = new Date(t.date);
-        const monthKey = `${date.getFullYear()}-${String(
-          date.getMonth() + 1
-        ).padStart(2, "0")}`;
+      const grouped = allTransactions.reduce(
+        (acc, t) => {
+          const date = new Date(t.date);
+          const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 
-        if (!acc[monthKey]) {
-          acc[monthKey] = { month: monthKey, income: 0, expense: 0 };
-        }
+          if (!acc[monthKey]) {
+            acc[monthKey] = { month: monthKey, income: 0, expense: 0 };
+          }
 
-        if (t.type === "INCOME") {
-          acc[monthKey].income += t.amount;
-        } else {
-          acc[monthKey].expense += t.amount;
-        }
+          if (t.type === "INCOME") {
+            acc[monthKey].income += t.amount;
+          } else {
+            acc[monthKey].expense += t.amount;
+          }
 
-        return acc;
-      }, {} as Record<string, { month: string; income: number; expense: number }>);
-
-      const result = Object.values(grouped).sort((a, b) =>
-        a.month.localeCompare(b.month)
+          return acc;
+        },
+        {} as Record<string, { month: string; income: number; expense: number }>,
       );
+
+      const result = Object.values(grouped).sort((a, b) => a.month.localeCompare(b.month));
 
       for (let i = 1; i < result.length; i++) {
         const prev = result[i - 1];

@@ -55,10 +55,7 @@ function parseType(value: string | null): TransactionType | "ALL" {
   return "ALL";
 }
 
-function parseCategoryId(
-  value: string | null,
-  validCategoryIds: Set<string>,
-): string | "ALL" {
+function parseCategoryId(value: string | null, validCategoryIds: Set<string>): string | "ALL" {
   if (!value || !validCategoryIds.has(value)) {
     return "ALL";
   }

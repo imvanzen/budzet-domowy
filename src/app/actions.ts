@@ -1,7 +1,12 @@
 "use server";
 
 import { getSummary, getExpensesByCategory, getMonthlyComparison } from "@/services/transactions";
-import type { SummaryData, CategoryExpense, MonthlyData, TransactionFilters } from "@/services/transactions";
+import type {
+  SummaryData,
+  CategoryExpense,
+  MonthlyData,
+  TransactionFilters,
+} from "@/services/transactions";
 
 export type DashboardData = {
   summary: SummaryData;
@@ -22,4 +27,3 @@ export async function getDashboardData(filters?: TransactionFilters): Promise<Da
     monthlyData,
   };
 }
-

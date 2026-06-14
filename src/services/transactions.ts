@@ -18,7 +18,7 @@ export type TransactionWithCategory = Transaction & {
 };
 
 export async function createTransaction(
-  input: Omit<NewTransaction, "id" | "createdAt" | "updatedAt">
+  input: Omit<NewTransaction, "id" | "createdAt" | "updatedAt">,
 ): Promise<Transaction> {
   const [transaction] = await db
     .insert(transactions)
@@ -33,7 +33,7 @@ export async function createTransaction(
 
 export async function updateTransaction(
   id: string,
-  input: Partial<Omit<NewTransaction, "id" | "createdAt" | "updatedAt">>
+  input: Partial<Omit<NewTransaction, "id" | "createdAt" | "updatedAt">>,
 ): Promise<Transaction> {
   const [transaction] = await db
     .update(transactions)
@@ -111,7 +111,7 @@ function buildTransactionConditions(filters?: TransactionFilters) {
 }
 
 function mapTransactionWithCategory(
-  t: Transaction & { category: { name: string } | null }
+  t: Transaction & { category: { name: string } | null },
 ): TransactionWithCategory {
   return {
     ...t,
@@ -120,7 +120,7 @@ function mapTransactionWithCategory(
 }
 
 export async function getTransactions(
-  filters?: TransactionFilters
+  filters?: TransactionFilters,
 ): Promise<TransactionWithCategory[]> {
   const result = await db.query.transactions.findMany({
     where: buildTransactionConditions(filters),
@@ -136,15 +136,12 @@ export async function getTransactions(
 export async function getPaginatedTransactions(
   filters?: TransactionFilters,
   page = 1,
-  pageSize = DEFAULT_PAGE_SIZE
+  pageSize = DEFAULT_PAGE_SIZE,
 ): Promise<PaginatedResult<TransactionWithCategory>> {
   const whereClause = buildTransactionConditions(filters);
   const safePage = Math.max(1, page);
 
-  const [totalResult] = await db
-    .select({ count: count() })
-    .from(transactions)
-    .where(whereClause);
+  const [totalResult] = await db.select({ count: count() }).from(transactions).where(whereClause);
 
   const total = totalResult?.count ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
@@ -201,21 +198,24 @@ export type CategoryExpense = {
 };
 
 export async function getExpensesByCategory(
-  filters?: TransactionFilters
+  filters?: TransactionFilters,
 ): Promise<CategoryExpense[]> {
   const allTransactions = await getTransactions(filters);
   const expenses = allTransactions.filter((t) => t.type === "EXPENSE");
 
-  const grouped = expenses.reduce((acc, t) => {
-    const key = t.categoryId || "null";
-    const name = t.category?.name || "Bez kategorii";
-    
-    if (!acc[key]) {
-      acc[key] = { categoryId: t.categoryId, categoryName: name, total: 0 };
-    }
-    acc[key].total += t.amount;
-    return acc;
-  }, {} as Record<string, CategoryExpense>);
+  const grouped = expenses.reduce(
+    (acc, t) => {
+      const key = t.categoryId || "null";
+      const name = t.category?.name || "Bez kategorii";
+
+      if (!acc[key]) {
+        acc[key] = { categoryId: t.categoryId, categoryName: name, total: 0 };
+      }
+      acc[key].total += t.amount;
+      return acc;
+    },
+    {} as Record<string, CategoryExpense>,
+  );
 
   return Object.values(grouped);
 }
@@ -226,27 +226,28 @@ export type MonthlyData = {
   expense: number;
 };
 
-export async function getMonthlyComparison(
-  filters?: TransactionFilters
-): Promise<MonthlyData[]> {
+export async function getMonthlyComparison(filters?: TransactionFilters): Promise<MonthlyData[]> {
   const allTransactions = await getTransactions(filters);
 
-  const grouped = allTransactions.reduce((acc, t) => {
-    const date = new Date(t.date);
-    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-    
-    if (!acc[monthKey]) {
-      acc[monthKey] = { month: monthKey, income: 0, expense: 0 };
-    }
-    
-    if (t.type === "INCOME") {
-      acc[monthKey].income += t.amount;
-    } else {
-      acc[monthKey].expense += t.amount;
-    }
-    
-    return acc;
-  }, {} as Record<string, MonthlyData>);
+  const grouped = allTransactions.reduce(
+    (acc, t) => {
+      const date = new Date(t.date);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+
+      if (!acc[monthKey]) {
+        acc[monthKey] = { month: monthKey, income: 0, expense: 0 };
+      }
+
+      if (t.type === "INCOME") {
+        acc[monthKey].income += t.amount;
+      } else {
+        acc[monthKey].expense += t.amount;
+      }
+
+      return acc;
+    },
+    {} as Record<string, MonthlyData>,
+  );
 
   return Object.values(grouped).sort((a, b) => a.month.localeCompare(b.month));
 }

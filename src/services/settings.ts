@@ -32,4 +32,3 @@ export async function updateSettings(currency: Currency): Promise<Settings> {
 
   return updated;
 }
-

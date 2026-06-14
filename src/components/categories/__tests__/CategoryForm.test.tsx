@@ -21,9 +21,7 @@ describe("CategoryForm", () => {
       render(<CategoryForm />);
 
       expect(screen.getByLabelText("Nazwa")).toBeInTheDocument();
-      expect(
-        screen.getByRole("button", { name: /dodaj kategorię/i })
-      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /dodaj kategorię/i })).toBeInTheDocument();
     });
 
     it("should render form in edit mode with pre-filled data", () => {
@@ -38,9 +36,7 @@ describe("CategoryForm", () => {
 
       const nameInput = screen.getByLabelText("Nazwa") as HTMLInputElement;
       expect(nameInput.value).toBe("Test Category");
-      expect(
-        screen.getByRole("button", { name: /zapisz/i })
-      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /zapisz/i })).toBeInTheDocument();
     });
 
     it("should show cancel button in edit mode", () => {
@@ -54,9 +50,7 @@ describe("CategoryForm", () => {
       const onCancel = vi.fn();
       render(<CategoryForm category={category} onCancel={onCancel} />);
 
-      expect(
-        screen.getByRole("button", { name: /anuluj/i })
-      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /anuluj/i })).toBeInTheDocument();
     });
   });
 
@@ -71,15 +65,18 @@ describe("CategoryForm", () => {
       // Ensure input is empty and submit
       await user.clear(nameInput);
       // Wait a bit for the clear to take effect
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       if (form) {
         fireEvent.submit(form);
       }
 
-      await waitFor(() => {
-        expect(screen.getByText("Nazwa kategorii jest wymagana")).toBeInTheDocument();
-      }, { timeout: 3000 });
+      await waitFor(
+        () => {
+          expect(screen.getByText("Nazwa kategorii jest wymagana")).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
     });
 
     it("should show error for whitespace-only name", async () => {
@@ -95,9 +92,7 @@ describe("CategoryForm", () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText("Nazwa kategorii jest wymagana")
-        ).toBeInTheDocument();
+        expect(screen.getByText("Nazwa kategorii jest wymagana")).toBeInTheDocument();
       });
     });
 
@@ -112,15 +107,18 @@ describe("CategoryForm", () => {
       // Clear and type the long name
       await user.clear(nameInput);
       await user.type(nameInput, longName);
-      
+
       if (form) {
         fireEvent.submit(form);
       }
 
       // Client-side validation should catch this before calling server action
-      await waitFor(() => {
-        expect(screen.getByText("Nazwa nie może przekraczać 100 znaków")).toBeInTheDocument();
-      }, { timeout: 3000 });
+      await waitFor(
+        () => {
+          expect(screen.getByText("Nazwa nie może przekraczać 100 znaków")).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
 
       // Verify server action was not called
       expect(addCategory).not.toHaveBeenCalled();
@@ -154,9 +152,7 @@ describe("CategoryForm", () => {
       });
 
       await waitFor(() => {
-        expect(
-          screen.getByText("Kategoria została dodana pomyślnie!")
-        ).toBeInTheDocument();
+        expect(screen.getByText("Kategoria została dodana pomyślnie!")).toBeInTheDocument();
       });
     });
 
@@ -189,9 +185,7 @@ describe("CategoryForm", () => {
       });
 
       await waitFor(() => {
-        expect(
-          screen.getByText("Kategoria została zaktualizowana!")
-        ).toBeInTheDocument();
+        expect(screen.getByText("Kategoria została zaktualizowana!")).toBeInTheDocument();
       });
     });
 
@@ -278,10 +272,12 @@ describe("CategoryForm", () => {
       await user.type(nameInput, "Test Category");
       await user.click(submitButton);
 
-      await waitFor(() => {
-        expect(onSuccess).toHaveBeenCalled();
-      }, { timeout: 2000 });
+      await waitFor(
+        () => {
+          expect(onSuccess).toHaveBeenCalled();
+        },
+        { timeout: 2000 },
+      );
     });
   });
 });
-

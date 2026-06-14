@@ -10,10 +10,7 @@ type EditTransactionPageProps = {
 };
 
 async function EditTransactionContent({ id }: { id: string }) {
-  const [transaction, categories] = await Promise.all([
-    getTransaction(id),
-    getCategories(),
-  ]);
+  const [transaction, categories] = await Promise.all([getTransaction(id), getCategories()]);
 
   if (!transaction) {
     notFound();
@@ -48,11 +45,7 @@ export default function EditTransactionPage({ params }: EditTransactionPageProps
   );
 }
 
-async function EditTransactionContentWrapper({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+async function EditTransactionContentWrapper({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return <EditTransactionContent id={id} />;
 }

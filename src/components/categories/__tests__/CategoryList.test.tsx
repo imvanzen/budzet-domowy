@@ -78,9 +78,7 @@ describe("CategoryList", () => {
       await user.click(deleteButtons[0]!);
 
       await waitFor(() => {
-        expect(
-          screen.getByText(/Czy na pewno chcesz usunąć tę kategorię\?/)
-        ).toBeInTheDocument();
+        expect(screen.getByText(/Czy na pewno chcesz usunąć tę kategorię\?/)).toBeInTheDocument();
       });
     });
 
@@ -97,9 +95,7 @@ describe("CategoryList", () => {
       await user.click(deleteButtons[0]!);
 
       await waitFor(() => {
-        expect(
-          screen.getByText(/Czy na pewno chcesz usunąć tę kategorię\?/)
-        ).toBeInTheDocument();
+        expect(screen.getByText(/Czy na pewno chcesz usunąć tę kategorię\?/)).toBeInTheDocument();
       });
 
       const confirmButton = screen.getByRole("button", { name: /usuń/i });
@@ -119,9 +115,7 @@ describe("CategoryList", () => {
       await user.click(deleteButtons[0]!);
 
       await waitFor(() => {
-        expect(
-          screen.getByText(/Czy na pewno chcesz usunąć tę kategorię\?/)
-        ).toBeInTheDocument();
+        expect(screen.getByText(/Czy na pewno chcesz usunąć tę kategorię\?/)).toBeInTheDocument();
       });
 
       const cancelButton = screen.getByRole("button", { name: /anuluj/i });
@@ -129,10 +123,9 @@ describe("CategoryList", () => {
 
       await waitFor(() => {
         expect(
-          screen.queryByText("Czy na pewno chcesz usunąć tę kategorię?")
+          screen.queryByText("Czy na pewno chcesz usunąć tę kategorię?"),
         ).not.toBeInTheDocument();
       });
     });
   });
 });
-

@@ -51,9 +51,7 @@ describe("Categories Actions", () => {
         updatedAt: new Date(),
       };
 
-      vi.mocked(categoriesService.createCategory).mockResolvedValue(
-        mockCategory as any
-      );
+      vi.mocked(categoriesService.createCategory).mockResolvedValue(mockCategory as any);
 
       const result = await addCategory({ name });
 
@@ -71,9 +69,7 @@ describe("Categories Actions", () => {
         updatedAt: new Date(),
       };
 
-      vi.mocked(categoriesService.createCategory).mockResolvedValue(
-        mockCategory as any
-      );
+      vi.mocked(categoriesService.createCategory).mockResolvedValue(mockCategory as any);
 
       const result = await addCategory({ name: "Test Category" });
 
@@ -84,9 +80,7 @@ describe("Categories Actions", () => {
     });
 
     it("should handle database errors gracefully", async () => {
-      vi.mocked(categoriesService.createCategory).mockRejectedValue(
-        new Error("Database error")
-      );
+      vi.mocked(categoriesService.createCategory).mockRejectedValue(new Error("Database error"));
 
       const result = await addCategory({ name: "Test Category" });
 
@@ -119,9 +113,7 @@ describe("Categories Actions", () => {
         updatedAt: new Date(),
       };
 
-      vi.mocked(categoriesService.updateCategory).mockResolvedValue(
-        mockCategory as any
-      );
+      vi.mocked(categoriesService.updateCategory).mockResolvedValue(mockCategory as any);
 
       const result = await editCategory("test-id", { name: "Updated Name" });
 
@@ -139,9 +131,7 @@ describe("Categories Actions", () => {
         updatedAt: new Date(),
       };
 
-      vi.mocked(categoriesService.updateCategory).mockResolvedValue(
-        mockCategory as any
-      );
+      vi.mocked(categoriesService.updateCategory).mockResolvedValue(mockCategory as any);
 
       const result = await editCategory("test-id", {});
 
@@ -149,9 +139,7 @@ describe("Categories Actions", () => {
     });
 
     it("should handle database errors gracefully", async () => {
-      vi.mocked(categoriesService.updateCategory).mockRejectedValue(
-        new Error("Database error")
-      );
+      vi.mocked(categoriesService.updateCategory).mockRejectedValue(new Error("Database error"));
 
       const result = await editCategory("test-id", { name: "Updated Name" });
 
@@ -171,9 +159,7 @@ describe("Categories Actions", () => {
     });
 
     it("should handle database errors gracefully", async () => {
-      vi.mocked(categoriesService.deleteCategory).mockRejectedValue(
-        new Error("Database error")
-      );
+      vi.mocked(categoriesService.deleteCategory).mockRejectedValue(new Error("Database error"));
 
       const result = await removeCategory("test-id");
 
@@ -182,4 +168,3 @@ describe("Categories Actions", () => {
     });
   });
 });
-

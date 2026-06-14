@@ -15,10 +15,7 @@ import {
 type TransactionDateRangeFilterProps = {
   preset: TransactionPeriodPreset;
   dateRange: RangeValue<DateValue>;
-  onDateFilterChange: (
-    preset: TransactionPeriodPreset,
-    range: RangeValue<DateValue>,
-  ) => void;
+  onDateFilterChange: (preset: TransactionPeriodPreset, range: RangeValue<DateValue>) => void;
 };
 
 export function TransactionDateRangeFilter({
@@ -75,20 +72,20 @@ export function TransactionDateRangeFilter({
       }}
       CalendarTopContent={
         <div className="flex w-44 shrink-0 flex-col gap-0.5 p-2">
-            {TRANSACTION_PERIOD_PRESETS.map((item) => (
-              <button
-                key={item.value}
-                type="button"
-                className={`rounded-md px-3 py-2 text-left text-sm transition-colors ${
-                  preset === item.value
-                    ? "bg-primary-100 font-medium text-primary"
-                    : "text-default-600 hover:bg-default-100"
-                }`}
-                onClick={() => applyPreset(item.value)}
-              >
-                {item.label}
-              </button>
-            ))}
+          {TRANSACTION_PERIOD_PRESETS.map((item) => (
+            <button
+              key={item.value}
+              type="button"
+              className={`rounded-md px-3 py-2 text-left text-sm transition-colors ${
+                preset === item.value
+                  ? "bg-primary-100 font-medium text-primary"
+                  : "text-default-600 hover:bg-default-100"
+              }`}
+              onClick={() => applyPreset(item.value)}
+            >
+              {item.label}
+            </button>
+          ))}
         </div>
       }
     />

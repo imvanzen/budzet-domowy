@@ -12,11 +12,7 @@ type TransactionFormPageProps = {
   title: string;
 };
 
-export function TransactionFormPage({
-  categories,
-  transaction,
-  title,
-}: TransactionFormPageProps) {
+export function TransactionFormPage({ categories, transaction, title }: TransactionFormPageProps) {
   const router = useRouter();
 
   const handleNavigateBack = () => {

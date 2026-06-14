@@ -7,8 +7,7 @@ export const transactionType = {
   EXPENSE: "EXPENSE",
 } as const;
 
-export type TransactionType =
-  (typeof transactionType)[keyof typeof transactionType];
+export type TransactionType = (typeof transactionType)[keyof typeof transactionType];
 
 export const currency = {
   PLN: "PLN",

@@ -39,10 +39,7 @@ async function main() {
     { name: "Inne" }, // Other
   ];
 
-  const insertedCategories = await db
-    .insert(categories)
-    .values(seedCategories)
-    .returning();
+  const insertedCategories = await db.insert(categories).values(seedCategories).returning();
 
   console.log(`✅ Created ${insertedCategories.length} categories`);
 
@@ -143,11 +140,7 @@ async function main() {
       allTransactions.push({
         amount: randomAmount(200, 400),
         type: "EXPENSE",
-        date: new Date(
-          date.getFullYear(),
-          date.getMonth(),
-          Math.floor(randomAmount(1, 28))
-        ),
+        date: new Date(date.getFullYear(), date.getMonth(), Math.floor(randomAmount(1, 28))),
         description: randomItem([
           "Zakupy spożywcze Biedronka",
           "Zakupy Lidl",
@@ -164,11 +157,7 @@ async function main() {
       allTransactions.push({
         amount: randomAmount(40, 120),
         type: "EXPENSE",
-        date: new Date(
-          date.getFullYear(),
-          date.getMonth(),
-          Math.floor(randomAmount(1, 28))
-        ),
+        date: new Date(date.getFullYear(), date.getMonth(), Math.floor(randomAmount(1, 28))),
         description: randomItem([
           "Obiad w restauracji",
           "Pizza",
@@ -186,18 +175,8 @@ async function main() {
       allTransactions.push({
         amount: randomAmount(50, 200),
         type: "EXPENSE",
-        date: new Date(
-          date.getFullYear(),
-          date.getMonth(),
-          Math.floor(randomAmount(1, 28))
-        ),
-        description: randomItem([
-          "Tankowanie",
-          "Uber",
-          "Bolt",
-          "Taxi",
-          "Parking",
-        ]),
+        date: new Date(date.getFullYear(), date.getMonth(), Math.floor(randomAmount(1, 28))),
+        description: randomItem(["Tankowanie", "Uber", "Bolt", "Taxi", "Parking"]),
         categoryId: catMap.transport,
       });
     }
@@ -208,11 +187,7 @@ async function main() {
       allTransactions.push({
         amount: randomAmount(30, 150),
         type: "EXPENSE",
-        date: new Date(
-          date.getFullYear(),
-          date.getMonth(),
-          Math.floor(randomAmount(1, 28))
-        ),
+        date: new Date(date.getFullYear(), date.getMonth(), Math.floor(randomAmount(1, 28))),
         description: randomItem([
           "Kino",
           "Teatr",
@@ -231,18 +206,8 @@ async function main() {
       allTransactions.push({
         amount: randomAmount(50, 300),
         type: "EXPENSE",
-        date: new Date(
-          date.getFullYear(),
-          date.getMonth(),
-          Math.floor(randomAmount(1, 28))
-        ),
-        description: randomItem([
-          "Wizyta u lekarza",
-          "Leki",
-          "Dentysta",
-          "Badania",
-          "Okulary",
-        ]),
+        date: new Date(date.getFullYear(), date.getMonth(), Math.floor(randomAmount(1, 28))),
+        description: randomItem(["Wizyta u lekarza", "Leki", "Dentysta", "Badania", "Okulary"]),
         categoryId: catMap.health,
       });
     }
@@ -252,11 +217,7 @@ async function main() {
       allTransactions.push({
         amount: randomAmount(100, 500),
         type: "EXPENSE",
-        date: new Date(
-          date.getFullYear(),
-          date.getMonth(),
-          Math.floor(randomAmount(1, 28))
-        ),
+        date: new Date(date.getFullYear(), date.getMonth(), Math.floor(randomAmount(1, 28))),
         description: randomItem([
           "Kurs online",
           "Książki techniczne",
@@ -274,11 +235,7 @@ async function main() {
       allTransactions.push({
         amount: randomAmount(50, 300),
         type: "EXPENSE",
-        date: new Date(
-          date.getFullYear(),
-          date.getMonth(),
-          Math.floor(randomAmount(1, 28))
-        ),
+        date: new Date(date.getFullYear(), date.getMonth(), Math.floor(randomAmount(1, 28))),
         description: randomItem([
           "Ubrania",
           "Prezent",
@@ -299,7 +256,7 @@ async function main() {
     const batch = allTransactions.slice(i, i + batchSize);
     await db.insert(transactions).values(batch);
     console.log(
-      `✅ Inserted batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(allTransactions.length / batchSize)}`
+      `✅ Inserted batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(allTransactions.length / batchSize)}`,
     );
   }
 
@@ -315,9 +272,13 @@ async function main() {
 
   console.log("🎉 Seeding completed!");
   console.log(`   Total transactions: ${allTransactions.length}`);
-  console.log(`   Income transactions: ${allTransactions.filter((t) => t.type === "INCOME").length}`);
-  console.log(`   Expense transactions: ${allTransactions.filter((t) => t.type === "EXPENSE").length}`);
-  
+  console.log(
+    `   Income transactions: ${allTransactions.filter((t) => t.type === "INCOME").length}`,
+  );
+  console.log(
+    `   Expense transactions: ${allTransactions.filter((t) => t.type === "EXPENSE").length}`,
+  );
+
   process.exit(0);
 }
 

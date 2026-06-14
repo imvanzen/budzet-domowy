@@ -3,10 +3,7 @@
 import { useCallback } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-export type UrlSearchParamsUpdate = Record<
-  string,
-  string | number | null | undefined
->;
+export type UrlSearchParamsUpdate = Record<string, string | number | null | undefined>;
 
 type UpdateSearchParamsOptions = {
   resetKeys?: string[];
@@ -18,10 +15,7 @@ export function useUrlSearchParams() {
   const searchParams = useSearchParams();
 
   const updateSearchParams = useCallback(
-    (
-      updates: UrlSearchParamsUpdate,
-      options?: UpdateSearchParamsOptions,
-    ) => {
+    (updates: UrlSearchParamsUpdate, options?: UpdateSearchParamsOptions) => {
       const params = new URLSearchParams(searchParams.toString());
 
       for (const [key, value] of Object.entries(updates)) {

@@ -41,9 +41,7 @@ describe("TransactionForm", () => {
       expect(screen.getAllByLabelText("Data").length).toBeGreaterThan(0);
       expect(screen.getByText("Kategoria")).toBeInTheDocument();
       expect(screen.getByLabelText("Opis")).toBeInTheDocument();
-      expect(
-        screen.getByRole("button", { name: /dodaj transakcję/i }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /dodaj transakcję/i })).toBeInTheDocument();
     });
   });
 
@@ -63,9 +61,7 @@ describe("TransactionForm", () => {
       }
 
       await waitFor(() => {
-        expect(
-          screen.getByText("Kwota musi być większa od 0"),
-        ).toBeInTheDocument();
+        expect(screen.getByText("Kwota musi być większa od 0")).toBeInTheDocument();
       });
     });
 
@@ -84,9 +80,7 @@ describe("TransactionForm", () => {
       }
 
       await waitFor(() => {
-        expect(
-          screen.getByText("Kwota musi być większa od 0"),
-        ).toBeInTheDocument();
+        expect(screen.getByText("Kwota musi być większa od 0")).toBeInTheDocument();
       });
     });
 

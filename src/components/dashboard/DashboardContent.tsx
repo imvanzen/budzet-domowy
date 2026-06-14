@@ -3,10 +3,7 @@
 import { Card, CardBody } from "@heroui/card";
 import { useEffect, useState, useTransition } from "react";
 import { type DashboardData, getDashboardData } from "@/app/actions";
-import {
-  type PeriodPreset,
-  SelectPeriod,
-} from "@/components/shared/SelectPeriod";
+import { type PeriodPreset, SelectPeriod } from "@/components/shared/SelectPeriod";
 import { DashboardChartsSkeleton } from "@/components/skeletons/DashboardChartsSkeleton";
 import { SummaryCardsSkeleton } from "@/components/skeletons/SummaryCardsSkeleton";
 import type { Currency } from "@/db/schema";
@@ -21,10 +18,7 @@ type DashboardContentProps = {
   currency: Currency;
 };
 
-export function DashboardContent({
-  initialData,
-  currency,
-}: DashboardContentProps) {
+export function DashboardContent({ initialData, currency }: DashboardContentProps) {
   const [preset, setPreset] = useState<PeriodPreset>("current-month");
   const now = new Date();
   const [dateFrom, setDateFrom] = useState(
@@ -37,11 +31,7 @@ export function DashboardContent({
   useEffect(() => {
     const fetchData = () => {
       startTransition(async () => {
-        const { dateFrom: from, dateTo: to } = getDateRangeFromPreset(
-          preset,
-          dateFrom,
-          dateTo,
-        );
+        const { dateFrom: from, dateTo: to } = getDateRangeFromPreset(preset, dateFrom, dateTo);
 
         const newData = await getDashboardData({
           dateFrom: from,
@@ -85,14 +75,8 @@ export function DashboardContent({
           />
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <ExpensesPieChart
-              data={data.expensesByCategory}
-              currency={currency}
-            />
-            <IncomeExpenseBarChart
-              data={data.monthlyData}
-              currency={currency}
-            />
+            <ExpensesPieChart data={data.expensesByCategory} currency={currency} />
+            <IncomeExpenseBarChart data={data.monthlyData} currency={currency} />
           </div>
         </>
       )}

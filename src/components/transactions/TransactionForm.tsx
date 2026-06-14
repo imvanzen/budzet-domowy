@@ -5,25 +5,12 @@ import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
-import {
-  HiCheck,
-  HiPlus,
-  HiXMark,
-} from "react-icons/hi2";
-import {
-  Textarea,
-  DatePicker,
-  Autocomplete,
-  AutocompleteItem,
-} from "@heroui/react";
+import { HiCheck, HiPlus, HiXMark } from "react-icons/hi2";
+import { Textarea, DatePicker, Autocomplete, AutocompleteItem } from "@heroui/react";
 import type { DateValue } from "@internationalized/date";
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { editTransaction } from "@/app/transactions/actions";
-import {
-  calendarDateToDate,
-  dateToCalendarDate,
-  getMaxSelectableDate,
-} from "@/lib/dateRange";
+import { calendarDateToDate, dateToCalendarDate, getMaxSelectableDate } from "@/lib/dateRange";
 import { setPendingTransaction } from "@/lib/pending-transaction";
 import { showSyncToast } from "@/lib/sync-toast";
 import type { Category, Transaction } from "@/db/schema";
@@ -41,11 +28,7 @@ type FieldErrors = {
   description?: string;
 };
 
-export function TransactionForm({
-  categories,
-  transaction,
-  onCancel,
-}: TransactionFormProps) {
+export function TransactionForm({ categories, transaction, onCancel }: TransactionFormProps) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -53,9 +36,7 @@ export function TransactionForm({
 
   const [amount, setAmount] = useState("");
   const [type, setType] = useState<"INCOME" | "EXPENSE" | "">("");
-  const [dateValue, setDateValue] = useState<DateValue>(() =>
-    today(getLocalTimeZone()),
-  );
+  const [dateValue, setDateValue] = useState<DateValue>(() => today(getLocalTimeZone()));
   const [categoryId, setCategoryId] = useState<string>("");
   const [description, setDescription] = useState("");
 
@@ -243,9 +224,7 @@ export function TransactionForm({
           type="submit"
           color="primary"
           className={onCancel ? "flex-1" : "w-full"}
-          startContent={
-            isEditMode ? <HiCheck aria-hidden /> : <HiPlus aria-hidden />
-          }
+          startContent={isEditMode ? <HiCheck aria-hidden /> : <HiPlus aria-hidden />}
         >
           {isEditMode ? "Zapisz" : "Dodaj transakcję"}
         </Button>

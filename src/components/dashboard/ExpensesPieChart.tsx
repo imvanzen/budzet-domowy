@@ -2,7 +2,7 @@
 
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { HiChartPie } from "react-icons/hi2";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { formatCurrency } from "@/lib/format";
 import type { Currency } from "@/db/schema";
 import type { CategoryExpense } from "@/services/transactions";
@@ -54,9 +54,7 @@ export function ExpensesPieChart({ data, currency }: ExpensesPieChartProps) {
       return (
         <div className="rounded-lg border border-default-200 bg-background p-2 shadow-lg">
           <p className="font-semibold">{payload[0].name}</p>
-          <p className="text-sm text-primary">
-            {formatCurrency(payload[0].value, currency)}
-          </p>
+          <p className="text-sm text-primary">{formatCurrency(payload[0].value, currency)}</p>
         </div>
       );
     }

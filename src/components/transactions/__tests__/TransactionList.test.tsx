@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@/__tests__/test-utils";
 import { TransactionList } from "../TransactionList";
-import { removeTransaction } from "@/app/transactions/actions";
 import { transactionType } from "@/db/schema";
 import type { Transaction } from "@/db/schema";
 
@@ -11,9 +10,7 @@ vi.mock("@/app/transactions/actions", () => ({
 }));
 
 describe("TransactionList", () => {
-  const mockTransactions: Array<
-    Transaction & { category: { name: string } | null }
-  > = [
+  const mockTransactions: Array<Transaction & { category: { name: string } | null }> = [
     {
       id: "trans-1",
       amount: 100.5,
@@ -114,9 +111,7 @@ describe("TransactionList", () => {
 
   describe("interactions", () => {
     it("should link to edit page when edit button is clicked", () => {
-      render(
-        <TransactionList transactions={mockTransactions} currency="PLN" />
-      );
+      render(<TransactionList transactions={mockTransactions} currency="PLN" />);
 
       const editLinks = screen.getAllByRole("link", { name: /edytuj/i });
       expect(editLinks[0]).toHaveAttribute("href", "/transactions/trans-1/edit");

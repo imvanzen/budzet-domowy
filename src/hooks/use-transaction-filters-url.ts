@@ -30,10 +30,7 @@ type UseTransactionFiltersUrlResult = TransactionFiltersUrlState & {
   setCategoryId: (categoryId: string | "ALL") => void;
   setDatePreset: (preset: TransactionPeriodPreset) => void;
   setDateRange: (range: RangeValue<DateValue>) => void;
-  setDateFilter: (
-    preset: TransactionPeriodPreset,
-    range: RangeValue<DateValue>,
-  ) => void;
+  setDateFilter: (preset: TransactionPeriodPreset, range: RangeValue<DateValue>) => void;
   setSearchInput: (phrase: string) => void;
   setPage: (page: number) => void;
 };
@@ -44,10 +41,7 @@ function formatDateParam(value: DateValue): string {
   return `${value.year}-${month}-${day}`;
 }
 
-function areRangesEqual(
-  left: RangeValue<DateValue>,
-  right: RangeValue<DateValue>,
-): boolean {
+function areRangesEqual(left: RangeValue<DateValue>, right: RangeValue<DateValue>): boolean {
   return (
     formatDateParam(left.start) === formatDateParam(right.start) &&
     formatDateParam(left.end) === formatDateParam(right.end)
@@ -60,10 +54,7 @@ function updateDateFilterIfChanged(
   preset: TransactionPeriodPreset,
   range: RangeValue<DateValue>,
 ) {
-  if (
-    current.datePreset === preset &&
-    areRangesEqual(current.dateRange, range)
-  ) {
+  if (current.datePreset === preset && areRangesEqual(current.dateRange, range)) {
     return;
   }
 
@@ -91,7 +82,7 @@ export function useTransactionFiltersUrl({
 
   const urlState = useMemo(
     () => parseTransactionFiltersFromSearchParams(searchParams, categoryIds),
-    [searchParams, categoryIds.join(",")],
+    [searchParams, categoryIds],
   );
 
   const [searchInput, setSearchInput] = useState(urlState.searchPhrase);
@@ -134,16 +125,8 @@ export function useTransactionFiltersUrl({
   }, [searchInput, updateSearchParams, urlState.searchPhrase]);
 
   const updateDateFilter = useCallback(
-    (
-      preset: TransactionPeriodPreset,
-      range: RangeValue<DateValue>,
-    ) => {
-      updateDateFilterIfChanged(
-        updateSearchParams,
-        urlState,
-        preset,
-        range,
-      );
+    (preset: TransactionPeriodPreset, range: RangeValue<DateValue>) => {
+      updateDateFilterIfChanged(updateSearchParams, urlState, preset, range);
     },
     [updateSearchParams, urlState],
   );
@@ -161,8 +144,7 @@ export function useTransactionFiltersUrl({
   const setCategoryId = useCallback(
     (categoryId: string | "ALL") => {
       updateSearchParams({
-        [TRANSACTION_URL_PARAMS.category]:
-          categoryId === "ALL" ? null : categoryId,
+        [TRANSACTION_URL_PARAMS.category]: categoryId === "ALL" ? null : categoryId,
         [TRANSACTION_URL_PARAMS.page]: null,
       });
     },
@@ -170,10 +152,7 @@ export function useTransactionFiltersUrl({
   );
 
   const setDateFilter = useCallback(
-    (
-      preset: TransactionPeriodPreset,
-      range: RangeValue<DateValue>,
-    ) => {
+    (preset: TransactionPeriodPreset, range: RangeValue<DateValue>) => {
       updateDateFilter(preset, range);
     },
     [updateDateFilter],

@@ -14,7 +14,7 @@ interface CategoryListProps {
 
 export function CategoryList({ categories, onEdit }: CategoryListProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [_isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -84,4 +84,3 @@ export function CategoryList({ categories, onEdit }: CategoryListProps) {
     </>
   );
 }
-

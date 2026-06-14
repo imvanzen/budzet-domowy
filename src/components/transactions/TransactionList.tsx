@@ -14,7 +14,7 @@ import {
 } from "react-icons/hi2";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { transactionType } from "@/db/schema";
-import type { Transaction, Currency } from "@/db/schema";
+import type { Currency } from "@/db/schema";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
 import { removeTransaction } from "@/app/transactions/actions";
 import type { TransactionWithCategory } from "@/services/transactions";
@@ -31,7 +31,7 @@ export function TransactionList({
   pendingIds = new Set(),
 }: TransactionListProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [_isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -58,86 +58,78 @@ export function TransactionList({
           const isPending = pendingIds.has(transaction.id);
 
           return (
-          <div
-            key={transaction.id}
-            className={`flex items-center justify-between gap-4 rounded-lg border border-default-200 p-4 transition-opacity ${
-              isPending ? "opacity-70" : ""
-            }`}
-          >
-            <div className="flex-1">
+            <div
+              key={transaction.id}
+              className={`flex items-center justify-between gap-4 rounded-lg border border-default-200 p-4 transition-opacity ${
+                isPending ? "opacity-70" : ""
+              }`}
+            >
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium ${
+                      transaction.type === transactionType.INCOME
+                        ? "bg-success-100 text-success-800"
+                        : "bg-danger-100 text-danger-800"
+                    }`}
+                  >
+                    {transaction.type === transactionType.INCOME ? (
+                      <HiArrowTrendingUp aria-hidden />
+                    ) : (
+                      <HiArrowTrendingDown aria-hidden />
+                    )}
+                    {transaction.type === transactionType.INCOME ? "Przychód" : "Wydatek"}
+                  </span>
+                  {isPending && <span className="text-xs text-default-400">Zapisywanie...</span>}
+                  <span className="flex items-center gap-1 text-sm text-default-500">
+                    <HiCalendarDays className="text-default-400" aria-hidden />
+                    {formatDate(transaction.date)}
+                  </span>
+                </div>
+                <div className="mt-1">
+                  {transaction.category && (
+                    <span className="flex items-center gap-1 text-sm text-default-600">
+                      <HiTag className="text-default-400" aria-hidden />
+                      {transaction.category.name}
+                    </span>
+                  )}
+                  {transaction.description && (
+                    <p className="text-sm text-default-500">{transaction.description}</p>
+                  )}
+                </div>
+              </div>
               <div className="flex items-center gap-2">
-                <span
-                  className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium ${
-                    transaction.type === transactionType.INCOME
-                      ? "bg-success-100 text-success-800"
-                      : "bg-danger-100 text-danger-800"
+                <p
+                  className={`text-lg font-semibold ${
+                    transaction.type === transactionType.INCOME ? "text-success" : "text-danger"
                   }`}
                 >
-                  {transaction.type === transactionType.INCOME ? (
-                    <HiArrowTrendingUp aria-hidden />
-                  ) : (
-                    <HiArrowTrendingDown aria-hidden />
-                  )}
-                  {transaction.type === transactionType.INCOME
-                    ? "Przychód"
-                    : "Wydatek"}
-                </span>
-                {isPending && (
-                  <span className="text-xs text-default-400">Zapisywanie...</span>
-                )}
-                <span className="flex items-center gap-1 text-sm text-default-500">
-                  <HiCalendarDays className="text-default-400" aria-hidden />
-                  {formatDate(transaction.date)}
-                </span>
-              </div>
-              <div className="mt-1">
-                {transaction.category && (
-                  <span className="flex items-center gap-1 text-sm text-default-600">
-                    <HiTag className="text-default-400" aria-hidden />
-                    {transaction.category.name}
-                  </span>
-                )}
-                {transaction.description && (
-                  <p className="text-sm text-default-500">
-                    {transaction.description}
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <p
-                className={`text-lg font-semibold ${
-                  transaction.type === transactionType.INCOME
-                    ? "text-success"
-                    : "text-danger"
-                }`}
-              >
-                {transaction.type === transactionType.INCOME ? "+" : "-"}
-                {formatCurrency(transaction.amount, currency)}
-              </p>
-              <Link href={`/transactions/${transaction.id}/edit`}>
+                  {transaction.type === transactionType.INCOME ? "+" : "-"}
+                  {formatCurrency(transaction.amount, currency)}
+                </p>
+                <Link href={`/transactions/${transaction.id}/edit`}>
+                  <Button
+                    size="sm"
+                    variant="light"
+                    isDisabled={isPending}
+                    startContent={<HiPencil aria-hidden />}
+                  >
+                    Edytuj
+                  </Button>
+                </Link>
                 <Button
                   size="sm"
+                  color="danger"
                   variant="light"
                   isDisabled={isPending}
-                  startContent={<HiPencil aria-hidden />}
+                  onPress={() => setDeleteId(transaction.id)}
+                  startContent={<HiTrash aria-hidden />}
                 >
-                  Edytuj
+                  Usuń
                 </Button>
-              </Link>
-              <Button
-                size="sm"
-                color="danger"
-                variant="light"
-                isDisabled={isPending}
-                onPress={() => setDeleteId(transaction.id)}
-                startContent={<HiTrash aria-hidden />}
-              >
-                Usuń
-              </Button>
+              </div>
             </div>
-          </div>
-        );
+          );
         })}
       </div>
 

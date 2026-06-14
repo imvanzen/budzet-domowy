@@ -7,26 +7,19 @@ import {
   parseTransactionFiltersFromSearchParams,
 } from "../transaction-filters-url";
 
-const REFERENCE_DATE = new Date(2026, 5, 13);
-
 describe("parseTransactionFiltersFromSearchParams", () => {
   const categoryIds = ["cat-1", "cat-2"];
 
   it("should return current-year default range when search params are empty", () => {
     const now = new Date();
-    const result = parseTransactionFiltersFromSearchParams(
-      new URLSearchParams(),
-      categoryIds,
-    );
+    const result = parseTransactionFiltersFromSearchParams(new URLSearchParams(), categoryIds);
 
     expect(result.selectedType).toBe("ALL");
     expect(result.selectedCategoryId).toBe("ALL");
     expect(result.searchPhrase).toBe("");
     expect(result.page).toBe(1);
     expect(result.datePreset).toBe("current-year");
-    expect(result.dateRange.start).toEqual(
-      parseDate(`${now.getFullYear()}-01-01`),
-    );
+    expect(result.dateRange.start).toEqual(parseDate(`${now.getFullYear()}-01-01`));
     expect(result.dateRange.end).toEqual(
       parseDate(
         `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`,
@@ -73,9 +66,7 @@ describe("parseTransactionFiltersFromSearchParams", () => {
     const result = parseTransactionFiltersFromSearchParams(params, categoryIds);
 
     expect(result.datePreset).toBe("current-year");
-    expect(result.dateRange.start).toEqual(
-      parseDate(`${now.getFullYear()}-01-01`),
-    );
+    expect(result.dateRange.start).toEqual(parseDate(`${now.getFullYear()}-01-01`));
   });
 });
 
